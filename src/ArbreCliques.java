@@ -144,7 +144,7 @@ public class ArbreCliques
 	 */
 	protected void addProcessus(Processus p, int profondeur)
 	{
-		if(p.getListeAssociations().contains(valeur))
+		if(valeur.accepte(p))
 		{
 			if(profondeur == 0) listeFils.add(new ArbreCliques(p));
 			else

@@ -22,25 +22,16 @@ public class Graphe {
 	public static void main(String[] args) 
 	{
 		Graphe g = new Graphe();
-		g.chargerGraphe("src/egfr20_flat.ph");
+		g.chargerGraphe("src/tcrsig40_flat.ph");
 		System.out.println("Graphe chargé. Calcul du HitlessGraph...");
 		g.getHitlessGraph();
 		System.out.println("HitlessGraph calculé. Nettoyage...");
 		g.nettoyerGraphe();
-		System.out.println("HitlessGraph nettoyé.");
-		System.out.println("Nombre de relations dans les sortes, ordre inverse:");
-		for(Sorte s: g.getListeSortes())
-		{
-			System.out.println(s.getNom() + " : " + s.getTotalAssociations());
-		}
+		System.out.println("HitlessGraph nettoyé. Suppression des listes de frappes...");
+		g.supprimerHits();
+		System.out.println("Frappes supprimées. Recherche des n-cliques...");
 		//g.reverseSortes();
-		g.trierSortes("asc");
-		System.out.println("Nombre de relations dans les sortes, ordre ascendant:");
-		for(Sorte s: g.getListeSortes())
-		{
-			System.out.println(s.getNom() + " : " + s.getTotalAssociations());
-		}
-		System.out.println("Recherche des n-cliques...");
+		//g.trierSortes("asc");
 		Date datedeb = new Date();
 		g.rechercherCliques();
 		Date datefin = new Date();
@@ -144,7 +135,7 @@ public class Graphe {
 		{
 			Sorte first = liste.removeFirst();
 			ajouterSorte(first);
-			System.out.println(liste.size());
+			//System.out.println(liste.size());
 			rechercherCliques(liste);	
 		}
 		
@@ -388,5 +379,18 @@ public class Graphe {
 	{
 		if(!(sens.equals("asc")||sens.equals("desc"))) throw new InvalidParameterException("Entrez \"asc\" ou \"desc\" en paramètre.");
 		listeSortes = trierSortes(sens, new LinkedList<Sorte>(listeSortes));
+	}
+	/**
+	 * supprime les listes de frappe pour libérer de la mémoire
+	 */
+	public void supprimerHits()
+	{
+		for(Sorte s: listeSortes)
+		{
+			for(Processus p: s.getListeProcessus())
+			{
+				p.setListeHits(null);
+			}
+		}
 	}
 }

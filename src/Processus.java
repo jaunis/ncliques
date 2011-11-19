@@ -8,7 +8,37 @@ public class Processus
 	protected LinkedList<Processus> listeHits = new LinkedList<Processus>();
 	protected Sorte sorte;
 	protected int numero;
+	protected Processus accepte;
+	protected Processus rejette;
 	
+	/**
+	 * @return the accepte
+	 */
+	public Processus getAccepte() {
+		return accepte;
+	}
+
+	/**
+	 * @param accepte the accepte to set
+	 */
+	public void setAccepte(Processus accepte) {
+		this.accepte = accepte;
+	}
+
+	/**
+	 * @return the rejette
+	 */
+	public Processus getRejette() {
+		return rejette;
+	}
+
+	/**
+	 * @param rejette the rejette to set
+	 */
+	public void setRejette(Processus rejette) {
+		this.rejette = rejette;
+	}
+
 	/**
 	 * @return the listeHits
 	 */
@@ -109,6 +139,25 @@ public class Processus
 				cont &= i.hasNext();
 			}
 			return (taille==tailleGraphe - 1); 
+		}
+	}
+	
+	public boolean accepte(Processus p)
+	{
+		if(accepte == p) return true;
+		else if(rejette == p) return false;
+		else
+		{
+			if(listeAssociations.contains(p))
+			{
+				accepte = p;
+				return true;
+			}
+			else
+			{
+				rejette = p;
+				return false;
+			}
 		}
 	}
 }
