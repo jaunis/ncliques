@@ -1,7 +1,7 @@
 import java.util.LinkedList;
 
 
-public class Sorte 
+public class Sorte implements Comparable<Sorte>
 {
 	protected LinkedList<Processus> listeProcessus = new LinkedList<Processus>();
 	protected Graphe graphe;
@@ -126,5 +126,25 @@ public class Sorte
 			somme += p.getListeAssociations().size();
 		}
 		return somme;
+	}
+	@Override
+	public int compareTo(Sorte s) 
+	{
+		if(this.getTotalAssociations()==s.getTotalAssociations()) return 0;
+		else if(this.getTotalAssociations() < s.getTotalAssociations()) return -1;
+		else return 1;
+	}
+	
+	public int getNbAssociations(Sorte s)
+	{
+		int res = 0;
+		for(Processus p: listeProcessus)
+		{
+			for(Processus a: p.getListeAssociations())
+			{
+				if(a.getSorte() == s) res += 1;
+			}
+		}
+		return res;
 	}
 }

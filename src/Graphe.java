@@ -3,6 +3,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.InvalidParameterException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -22,7 +23,7 @@ public class Graphe {
 	public static void main(String[] args) 
 	{
 		Graphe g = new Graphe();
-		g.chargerGraphe("src/tcrsig40_flat.ph");
+		g.chargerGraphe("src/graphes/egfr20_tcrsig40_flat.ph");
 		System.out.println("Graphe chargé. Calcul du HitlessGraph...");
 		g.getHitlessGraph();
 		System.out.println("HitlessGraph calculé. Nettoyage...");
@@ -32,6 +33,7 @@ public class Graphe {
 		System.out.println("Frappes supprimées. Recherche des n-cliques...");
 		//g.reverseSortes();
 		//g.trierSortes("asc");
+		g.trierSortesOptimal();
 		Date datedeb = new Date();
 		g.rechercherCliques();
 		Date datefin = new Date();
@@ -301,29 +303,9 @@ public class Graphe {
 	 */
 	public void reverseSortes()
 	{
-		LinkedList<Sorte> reversedList = new LinkedList<Sorte>();
-		for(Sorte s: listeSortes)
-		{
-			reversedList.addFirst(s);
-		}
-		listeSortes = reversedList;
+		Collections.reverse(listeSortes);
 	}
-	/**
-	 * Fonction de tri récursive appelée par trierSortes(String)
-	 * @param sens
-	 * @param liste
-	 * @return
-	 */
-	protected LinkedList<Sorte> trierSortes(String sens, LinkedList<Sorte> liste)
-	{
-		if(liste.size()==1) return liste;
-		else
-		{
-			Sorte first = liste.removeFirst();
-			return insererSorteDansListe(sens, trierSortes(sens, liste), first);
-		}
-	}
-	
+		
 	/**
 	 * Insère une Sorte au bon endroit dans une liste déjà triée<br/>
 	 * fonction appelée par rechercherCliques(String, LinkedList)
@@ -370,15 +352,54 @@ public class Graphe {
 	}
 	
 	/**
-	 * Trie la liste de Sortes par ordre croissant (sens="asc")
+	 * Trie la liste de Sortes par ordre aléatoire (sens="rand"), croissant (sens="asc")
 	 * ou décroissant (sens="desc")
 	 * @param sens
 	 * @throws InvalidParameterException
 	 */
 	public void trierSortes(String sens) throws InvalidParameterException
 	{
-		if(!(sens.equals("asc")||sens.equals("desc"))) throw new InvalidParameterException("Entrez \"asc\" ou \"desc\" en paramètre.");
-		listeSortes = trierSortes(sens, new LinkedList<Sorte>(listeSortes));
+		if(!(sens.equals("asc")||sens.equals("desc")||sens.equals("rand"))) throw new InvalidParameterException("Entrez \"rand\", \"asc\" ou \"desc\" en paramètre.");
+		if(sens.equals("rand")) Collections.shuffle(listeSortes);
+		else
+		{
+			Collections.sort(listeSortes);
+			if(sens.equals("desc")) Collections.reverse(listeSortes);
+		}
+	}
+	
+	public void trierSortesOptimal()
+	{
+		LinkedList<Sorte> listeTemp = new LinkedList<Sorte>();
+		Sorte min = Collections.min(listeSortes);
+		listeTemp.add(min);
+		listeSortes.remove(min);
+		while(!listeSortes.isEmpty())
+		{
+			min = sorteAInserer(listeTemp);
+			listeTemp.add(min);
+			listeSortes.remove(min);
+		}
+		listeSortes = listeTemp;
+	}
+	protected Sorte sorteAInserer(LinkedList<Sorte> listeTemp) 
+	{
+		Sorte res = listeSortes.getFirst();
+		int min = res.getNbAssociations(listeTemp.getFirst());
+		for(Sorte s: listeSortes)
+		{
+			int minLocal = s.getNbAssociations(listeTemp.getFirst());
+			for(Sorte s2: listeTemp)
+			{
+				if(minLocal > s.getNbAssociations(s2)) minLocal = s.getNbAssociations(s2);
+			}
+			if(minLocal<min)
+			{
+				min=minLocal;
+				res = s;
+			}
+		}
+		return res;
 	}
 	/**
 	 * supprime les listes de frappe pour libérer de la mémoire
