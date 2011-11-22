@@ -147,4 +147,20 @@ public class Sorte implements Comparable<Sorte>
 		}
 		return res;
 	}
+	
+	public int getNbAssociationsMin()
+	{
+		LinkedList<Sorte> listeSortes = this.graphe.getListeSortes();
+		Sorte s0 = listeSortes.getFirst() == this? listeSortes.getLast(): listeSortes.getFirst();
+		int min = getNbAssociations(s0);
+		for(Sorte s: listeSortes)
+		{
+			if(s != this)
+			{
+				int i = getNbAssociations(s);
+				if(i<min) min = i;
+			}
+		}
+		return min;
+	}
 }

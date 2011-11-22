@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.InvalidParameterException;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -32,14 +33,14 @@ public class Graphe {
 		g.supprimerHits();
 		System.out.println("Frappes supprimées. Recherche des n-cliques...");
 		//g.reverseSortes();
-		//g.trierSortes("asc");
-		g.trierSortesOptimal();
+		g.trierSortes("asc");
+		//g.trierSortesOptimal2();
 		Date datedeb = new Date();
 		g.rechercherCliques();
 		Date datefin = new Date();
 		long duree = datefin.getTime() - datedeb.getTime();
 		System.out.println("cliques trouvées en: " + duree);
-		System.out.println(g.afficherCliques());
+		//System.out.println(g.afficherCliques());
 	}
 	/**
 	 * @return the listeSortes
@@ -367,7 +368,10 @@ public class Graphe {
 			if(sens.equals("desc")) Collections.reverse(listeSortes);
 		}
 	}
-	
+	/**
+	 * sortes triées en fonction du nombre de relations avec les sortes précédentes de la liste<br/>
+	 * <b>Première sorte:</b> sorte dont le nombre total de relations est minimal
+	 */
 	public void trierSortesOptimal()
 	{
 		LinkedList<Sorte> listeTemp = new LinkedList<Sorte>();
@@ -382,6 +386,68 @@ public class Graphe {
 		}
 		listeSortes = listeTemp;
 	}
+	
+	/**
+	 * même algo que trierSortesOptimal()
+	 * <b>Première sorte</b>: sorte avec le nombre minimal de processus
+	 */
+	public void trierSortesOptimal2()
+	{
+		LinkedList<Sorte> listeTemp = new LinkedList<Sorte>();
+		Comparator<Sorte> comp = new Comparator<Sorte>(){
+
+			@Override
+			public int compare(Sorte s1, Sorte s2) 
+			{
+				if(s1.getListeProcessus().size()==s2.getListeProcessus().size()) return 0;
+				else if(s1.getListeProcessus().size()<s2.getListeProcessus().size()) return -1;
+				else return 1;
+			}
+			
+		};
+		Sorte min = Collections.min(listeSortes, comp);
+		listeTemp.add(min);
+		listeSortes.remove(min);
+		while(!listeSortes.isEmpty())
+		{
+			min = sorteAInserer(listeTemp);
+			listeTemp.add(min);
+			listeSortes.remove(min);
+		}
+		listeSortes = listeTemp;
+	}
+	
+	/**
+	 * même algo que trierSortesOptimal()
+	 * <b>Première sorte</b>: sorte dont le nombre minimal d'associations avec une sorte<br/>
+	 * est le plus petit de toutes les sortes
+	 */
+	public void trierSortesOptimal3()
+	{
+		LinkedList<Sorte> listeTemp = new LinkedList<Sorte>();
+		Comparator<Sorte> comp = new Comparator<Sorte>(){
+
+			@Override
+			public int compare(Sorte s1, Sorte s2) 
+			{
+				if(s1.getNbAssociationsMin()==s2.getNbAssociationsMin()) return 0;
+				else if(s1.getNbAssociationsMin()<s2.getNbAssociationsMin()) return -1;
+				else return 1;
+			}
+			
+		};
+		Sorte min = Collections.min(listeSortes, comp);
+		listeTemp.add(min);
+		listeSortes.remove(min);
+		while(!listeSortes.isEmpty())
+		{
+			min = sorteAInserer(listeTemp);
+			listeTemp.add(min);
+			listeSortes.remove(min);
+		}
+		listeSortes = listeTemp;
+	}
+	
 	protected Sorte sorteAInserer(LinkedList<Sorte> listeTemp) 
 	{
 		Sorte res = listeSortes.getFirst();
