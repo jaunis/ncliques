@@ -33,14 +33,14 @@ public class Graphe {
 		g.supprimerHits();
 		System.out.println("Frappes supprimées. Recherche des n-cliques...");
 		//g.reverseSortes();
-		g.trierSortes("asc");
-		//g.trierSortesOptimal2();
+		//g.trierSortes("asc");
+		g.trierSortesOptimal("minMinNbRelations", "moyenne");
 		Date datedeb = new Date();
 		g.rechercherCliques();
 		Date datefin = new Date();
 		long duree = datefin.getTime() - datedeb.getTime();
 		System.out.println("cliques trouvées en: " + duree);
-		//System.out.println(g.afficherCliques());
+		System.out.println(g.afficherCliques());
 	}
 	/**
 	 * @return the listeSortes
@@ -368,87 +368,101 @@ public class Graphe {
 			if(sens.equals("desc")) Collections.reverse(listeSortes);
 		}
 	}
-	/**
-	 * sortes triées en fonction du nombre de relations avec les sortes précédentes de la liste<br/>
-	 * <b>Première sorte:</b> sorte dont le nombre total de relations est minimal
-	 */
-	public void trierSortesOptimal()
-	{
-		LinkedList<Sorte> listeTemp = new LinkedList<Sorte>();
-		Sorte min = Collections.min(listeSortes);
-		listeTemp.add(min);
-		listeSortes.remove(min);
-		while(!listeSortes.isEmpty())
-		{
-			min = sorteAInserer(listeTemp);
-			listeTemp.add(min);
-			listeSortes.remove(min);
-		}
-		listeSortes = listeTemp;
-	}
 	
 	/**
-	 * même algo que trierSortesOptimal()
-	 * <b>Première sorte</b>: sorte avec le nombre minimal de processus
+	 * peut être appelée avec une LinkedList contenant une et une seule Sorte.<br/>
+	 * La Sorte précitée doit avoir été supprimée de listeSortes.
+	 * @param listeAmorcee
+	 * @param critere
+	 * @throws InvalidParameterException
 	 */
-	public void trierSortesOptimal2()
+	protected void trierSortes2(LinkedList<Sorte> listeAmorcee, String critere) throws InvalidParameterException
 	{
-		LinkedList<Sorte> listeTemp = new LinkedList<Sorte>();
-		Comparator<Sorte> comp = new Comparator<Sorte>(){
-
-			@Override
-			public int compare(Sorte s1, Sorte s2) 
+		LinkedList<String> listeCriteres = new LinkedList<String>();
+		listeCriteres.add("doubleMin");
+		listeCriteres.add("moyenne");
+		listeCriteres.add("simpleMin");
+		if(listeAmorcee.size() != 1) throw new InvalidParameterException("La première sorte doit être préalablement insérée.");
+		else
+		{
+			Sorte min;
+			while(!listeSortes.isEmpty())
 			{
-				if(s1.getListeProcessus().size()==s2.getListeProcessus().size()) return 0;
-				else if(s1.getListeProcessus().size()<s2.getListeProcessus().size()) return -1;
-				else return 1;
+				if(critere.equals("doubleMin")) min = sorteAInsererDoubleMin(listeAmorcee);
+				else if(critere.equals("moyenne")) min = sorteAInsererMoyenne(listeAmorcee);
+				else if(critere.equals("simpleMin")) min = sorteAInsererSimpleMin(listeAmorcee.getFirst());
+				else throw new InvalidParameterException("Le critère de tri doit être égal à " + listeCriteres);
+				listeAmorcee.add(min);
+				listeSortes.remove(min);
 			}
-			
-		};
-		Sorte min = Collections.min(listeSortes, comp);
-		listeTemp.add(min);
-		listeSortes.remove(min);
-		while(!listeSortes.isEmpty())
-		{
-			min = sorteAInserer(listeTemp);
-			listeTemp.add(min);
-			listeSortes.remove(min);
+			listeSortes = listeAmorcee;
 		}
-		listeSortes = listeTemp;
 	}
+	
 	
 	/**
-	 * même algo que trierSortesOptimal()
-	 * <b>Première sorte</b>: sorte dont le nombre minimal d'associations avec une sorte<br/>
-	 * est le plus petit de toutes les sortes
+	 * La condition initiale détermine la façon dont est choisie la première sorte:<br/>
+	 * <b>minSommeRelations</b> = elle possède la plus petite somme de relations<br/>
+	 * <b>minNbProcessus</b> = elle possède le nombre minimum de processus<br/>
+	 * <b>minMinNbRelations</b> = le nombre de relationsminimum qu'elle a avec les autres sortes est<br/>
+	 *  le plus petit de tout le graphe.<br/><br/>
+	 *  
+	 *  Le critère de tri détermine la façon dont sont insérées les sortes suivantes:<br/>
+	 *  <b>doubleMin</b> = de toutes les sortes, celles qui a le minimum de relations avec une des<br/>
+	 *  sortes déjà insérées<br/>
+	 *  <b>moyenne</b> = de toutes les sortes, celle dont la moyenne du nombre de relations est la plus faible<br/>
+	 *  <b>simpleMin</b> = de toutes les sortes, celle qui a le moins de relations avec le premier élément
+	 * @param conditionInitiale : minSommeRelations, minNbProcessus, minMinNbRelations
+	 * @param critereTri : doubleMin, moyenne, simpleMin
+	 * @throws InvalidParameterException
 	 */
-	public void trierSortesOptimal3()
+	public void trierSortesOptimal(String conditionInitiale, String critereTri) throws InvalidParameterException
 	{
+		LinkedList<String> listeCI = new LinkedList<String>();
+		listeCI.add("minSommeRelations");
+		listeCI.add("minNbProcessus");
+		listeCI.add("minMinNbRelations");
+		
 		LinkedList<Sorte> listeTemp = new LinkedList<Sorte>();
-		Comparator<Sorte> comp = new Comparator<Sorte>(){
-
-			@Override
-			public int compare(Sorte s1, Sorte s2) 
+		Sorte min;
+		if(conditionInitiale.equals("minSommeRelations")) min = Collections.min(listeSortes);
+		else if(conditionInitiale.equals("minNbProcessus"))
+		{
+			Comparator<Sorte> comp = new Comparator<Sorte>()
 			{
-				if(s1.getNbAssociationsMin()==s2.getNbAssociationsMin()) return 0;
-				else if(s1.getNbAssociationsMin()<s2.getNbAssociationsMin()) return -1;
-				else return 1;
-			}
-			
-		};
-		Sorte min = Collections.min(listeSortes, comp);
+				@Override
+				public int compare(Sorte s1, Sorte s2) 
+				{
+					if(s1.getListeProcessus().size()==s2.getListeProcessus().size()) return 0;
+					else if(s1.getListeProcessus().size()<s2.getListeProcessus().size()) return -1;
+					else return 1;
+				}
+				
+			};
+			min = Collections.min(listeSortes, comp);
+		}
+		else if(conditionInitiale.equals("minMinNbRelations"))
+		{
+			Comparator<Sorte> comp = new Comparator<Sorte>()
+			{
+				@Override
+				public int compare(Sorte s1, Sorte s2) 
+				{
+					if(s1.getNbAssociationsMin()==s2.getNbAssociationsMin()) return 0;
+					else if(s1.getNbAssociationsMin()<s2.getNbAssociationsMin()) return -1;
+					else return 1;
+				}
+				
+			};
+			min = Collections.min(listeSortes, comp);
+		}
+		else throw new InvalidParameterException("Le critère doit être égal à " + listeCI);
 		listeTemp.add(min);
 		listeSortes.remove(min);
-		while(!listeSortes.isEmpty())
-		{
-			min = sorteAInserer(listeTemp);
-			listeTemp.add(min);
-			listeSortes.remove(min);
-		}
-		listeSortes = listeTemp;
+		trierSortes2(listeTemp, critereTri);
 	}
 	
-	protected Sorte sorteAInserer(LinkedList<Sorte> listeTemp) 
+	protected Sorte sorteAInsererDoubleMin(LinkedList<Sorte> listeTemp) 
 	{
 		Sorte res = listeSortes.getFirst();
 		int min = res.getNbAssociations(listeTemp.getFirst());
@@ -462,6 +476,42 @@ public class Graphe {
 			if(minLocal<min)
 			{
 				min=minLocal;
+				res = s;
+			}
+		}
+		return res;
+	}
+	
+	protected Sorte sorteAInsererSimpleMin(Sorte sorte) 
+	{
+		Sorte res = listeSortes.getFirst();
+		int min = res.getNbAssociations(sorte);
+		for(Sorte s: listeSortes)
+		{
+			int nb = s.getNbAssociations(sorte);
+			if(nb<min)
+			{
+				min=nb;
+				res = s;
+			}
+		}
+		return res;
+	}
+	protected Sorte sorteAInsererMoyenne(LinkedList<Sorte> listeTemp) 
+	{
+		Sorte res = listeSortes.getFirst();
+		float min = res.getTotalAssociations();
+		for(Sorte s: listeSortes)
+		{
+			float moyenne = 0;
+			for(Sorte s2: listeTemp)
+			{
+				moyenne += s2.getNbAssociations(s);
+			}
+			moyenne = moyenne / listeTemp.size();
+			if(moyenne<min)
+			{
+				min=moyenne;
 				res = s;
 			}
 		}
