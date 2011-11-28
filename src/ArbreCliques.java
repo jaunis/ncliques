@@ -1,3 +1,4 @@
+import java.security.InvalidParameterException;
 import java.util.LinkedList;
 
 
@@ -18,6 +19,18 @@ public class ArbreCliques
 	{
 		
 	}
+	public ArbreCliques(ArbreCliques a) {
+		hauteur = a.getHauteur();
+		valeur = a.getValeur();
+		if(!a.estFeuille())
+		{
+			for(ArbreCliques f: a.getListeFils())
+			{
+				listeFils.add(new ArbreCliques(f));
+			}
+		}
+	}
+
 	/**
 	 * @return the hauteur
 	 */
@@ -191,5 +204,60 @@ public class ArbreCliques
 	public void nettoyer()
 	{
 		nettoyer(hauteur);
+	}
+
+	public void fusionner(ArbreCliques a) throws InvalidParameterException
+	{
+		if(a.getValeur()!=null) 
+			throw new InvalidParameterException("Il faut passer un arbre complet en paramètre (racine nulle)");
+		
+		ArbreCliques copie = new ArbreCliques(a);
+		boolean valide = true;
+		if(valeur != null) valide = copie.accepte(valeur);
+		if(valide)
+		{
+			if(estFeuille()) listeFils = copie.getListeFils();
+			else
+			{
+				for(ArbreCliques f: listeFils)
+				{
+					f.fusionner(copie);
+				}
+			}
+		}
+	}
+
+	protected boolean accepte(Processus valeur2) throws InvalidParameterException
+	{
+		if(valeur2 == null)
+			throw new InvalidParameterException("Impossible de passer une valeur nulle en paramètre.");
+		if(valeur == null && estFeuille()) return true;
+		else if(estFeuille()) return (valeur.getListeAssociations().contains(valeur2));
+		else
+		{
+			boolean b1 = true;
+			if(valeur != null) b1 = valeur.getListeAssociations().contains(valeur2);
+			if(!b1) return false;
+			else
+			{
+				boolean res = false;
+				LinkedList<ArbreCliques> listeSuppression = new LinkedList<ArbreCliques>();
+				for(ArbreCliques a: listeFils)
+				{
+					if(a.accepte(valeur2)) res = true;
+					else
+					{
+						listeSuppression.add(a);
+						res |= false;
+					}
+				}
+				for(ArbreCliques a: listeSuppression)
+				{
+					listeFils.remove(a);
+				}
+				return res;
+			}
+			
+		}
 	}
 }

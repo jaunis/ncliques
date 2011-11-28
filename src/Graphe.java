@@ -21,6 +21,10 @@ public class Graphe {
 	 */
 	protected ArbreCliques arbre = new ArbreCliques();
 		
+	/**
+	 * bons résultats avec moyenne
+	 * @param args
+	 */
 	public static void main(String[] args) 
 	{
 		Graphe g = new Graphe();
@@ -33,14 +37,15 @@ public class Graphe {
 		g.supprimerHits();
 		System.out.println("Frappes supprimées. Recherche des n-cliques...");
 		//g.reverseSortes();
-		//g.trierSortes("asc");
-		g.trierSortesOptimal("minMinNbRelations", "moyenne");
+		g.trierSortes("rand");
+		g.trierSortesOptimal("minMinNbRelations", "doubleMin");
 		Date datedeb = new Date();
+		//g.rechercherCliquesDPR();
 		g.rechercherCliques();
 		Date datefin = new Date();
 		long duree = datefin.getTime() - datedeb.getTime();
 		System.out.println("cliques trouvées en: " + duree);
-		System.out.println(g.afficherCliques());
+		//System.out.println(g.afficherCliques());
 	}
 	/**
 	 * @return the listeSortes
@@ -307,50 +312,6 @@ public class Graphe {
 		Collections.reverse(listeSortes);
 	}
 		
-	/**
-	 * Insère une Sorte au bon endroit dans une liste déjà triée<br/>
-	 * fonction appelée par rechercherCliques(String, LinkedList)
-	 * @param sens
-	 * @param liste
-	 * @param s
-	 * @return
-	 */
-	protected LinkedList<Sorte> insererSorteDansListe(String sens, LinkedList<Sorte> liste, Sorte s)
-	{
-		LinkedList<Sorte> listeTemp = new LinkedList<Sorte>();
-		boolean cont = true;
-		int taille = s.getTotalAssociations();
-		while(cont)
-		{
-			Sorte courant = liste.getFirst();
-			
-			if((sens.equals("asc") && (courant.getTotalAssociations()>=taille)) || (sens.equals("desc") && (courant.getTotalAssociations()<=taille)))
-			{
-				liste.addFirst(s);
-				cont = false;
-			}
-			else
-			{
-				
-				if(liste.size()==1)
-				{
-					liste.add(s);
-					cont = false;
-				}
-				else
-				{
-					liste.removeFirst();
-					listeTemp.addFirst(courant);
-				}
-			}
-		}
-		while(listeTemp.size()>0)
-		{
-			Sorte s2 = listeTemp.removeFirst();
-			liste.addFirst(s2);
-		}
-		return liste;
-	}
 	
 	/**
 	 * Trie la liste de Sortes par ordre aléatoire (sens="rand"), croissant (sens="asc")
@@ -382,6 +343,7 @@ public class Graphe {
 		listeCriteres.add("doubleMin");
 		listeCriteres.add("moyenne");
 		listeCriteres.add("simpleMin");
+		listeCriteres.add("doubleMinLimite");
 		if(listeAmorcee.size() != 1) throw new InvalidParameterException("La première sorte doit être préalablement insérée.");
 		else
 		{
@@ -391,6 +353,7 @@ public class Graphe {
 				if(critere.equals("doubleMin")) min = sorteAInsererDoubleMin(listeAmorcee);
 				else if(critere.equals("moyenne")) min = sorteAInsererMoyenne(listeAmorcee);
 				else if(critere.equals("simpleMin")) min = sorteAInsererSimpleMin(listeAmorcee.getFirst());
+				else if(critere.equals("doubleMinLimite")) min = sorteAInsererDoubleMinLimite(listeAmorcee);
 				else throw new InvalidParameterException("Le critère de tri doit être égal à " + listeCriteres);
 				listeAmorcee.add(min);
 				listeSortes.remove(min);
@@ -404,7 +367,7 @@ public class Graphe {
 	 * La condition initiale détermine la façon dont est choisie la première sorte:<br/>
 	 * <b>minSommeRelations</b> = elle possède la plus petite somme de relations<br/>
 	 * <b>minNbProcessus</b> = elle possède le nombre minimum de processus<br/>
-	 * <b>minMinNbRelations</b> = le nombre de relationsminimum qu'elle a avec les autres sortes est<br/>
+	 * <b>minMinNbRelations</b> = le nombre de relations minimum qu'elle a avec les autres sortes est<br/>
 	 *  le plus petit de tout le graphe.<br/><br/>
 	 *  
 	 *  Le critère de tri détermine la façon dont sont insérées les sortes suivantes:<br/>
@@ -473,7 +436,40 @@ public class Graphe {
 			{
 				if(minLocal > s.getNbAssociations(s2)) minLocal = s.getNbAssociations(s2);
 			}
-			if(minLocal<min)
+			if(minLocal == min)
+			{
+				if(s.getTotalAssociations() < res.getTotalAssociations()) res = s;
+			}
+			else if(minLocal<min)
+			{
+				min=minLocal;
+				res = s;
+			}
+		}
+		return res;
+	}
+	
+	protected Sorte sorteAInsererDoubleMinLimite(LinkedList<Sorte> listeTemp) 
+	{
+		int limite = Math.min(listeTemp.size(), (listeTemp.size() + listeSortes.size())/5);
+		Sorte res = listeSortes.getFirst();
+		int min = res.getNbAssociations(listeTemp.getFirst());
+		for(Sorte s: listeSortes)
+		{
+			int minLocal = s.getNbAssociations(listeTemp.getFirst());
+			Iterator<Sorte> i = listeTemp.iterator();
+			int j = 0;
+			while(j < limite)
+			{
+				Sorte s2 = i.next();
+				if(minLocal > s.getNbAssociations(s2)) minLocal = s.getNbAssociations(s2);
+				j++;
+			}
+			if(minLocal == min)
+			{
+				if(s.getTotalAssociations() < res.getTotalAssociations()) res = s;
+			}
+			else if(minLocal<min)
 			{
 				min=minLocal;
 				res = s;
@@ -489,7 +485,11 @@ public class Graphe {
 		for(Sorte s: listeSortes)
 		{
 			int nb = s.getNbAssociations(sorte);
-			if(nb<min)
+			if(nb == min)
+			{
+				if(s.getTotalAssociations() < res.getTotalAssociations()) res = s;
+			}
+			else if(nb<min)
 			{
 				min=nb;
 				res = s;
@@ -509,7 +509,11 @@ public class Graphe {
 				moyenne += s2.getNbAssociations(s);
 			}
 			moyenne = moyenne / listeTemp.size();
-			if(moyenne<min)
+			if(moyenne == min)
+			{
+				if(s.getTotalAssociations() < res.getTotalAssociations()) res = s;
+			}
+			else if(moyenne<min)
 			{
 				min=moyenne;
 				res = s;
@@ -529,5 +533,99 @@ public class Graphe {
 				p.setListeHits(null);
 			}
 		}
+	}
+	public void rechercherCliquesDPR()
+	{
+		arbre = rechercherCliquesDPR(new LinkedList<Sorte>(listeSortes));
+	}
+	protected ArbreCliques rechercherCliquesDPR(LinkedList<Sorte> liste)
+	{
+		if(liste.size() == 1)
+		{
+			ArbreCliques a = new ArbreCliques();
+			for(Processus p: liste.getFirst().getListeProcessus())
+			{
+				a.addProcessus(p);
+			}
+			a.setHauteur(1);
+			return a;
+		}
+		else
+		{
+			Comparator<Sorte> comp = new Comparator<Sorte>()
+			{
+				@Override
+				public int compare(Sorte s1, Sorte s2) 
+				{
+					if(s1.getNbAssociationsMin()==s2.getNbAssociationsMin()) return 0;
+					else if(s1.getNbAssociationsMin()<s2.getNbAssociationsMin()) return -1;
+					else return 1;
+				}
+				
+			};
+			Sorte s1 = Collections.min(liste, comp);
+			liste.remove(s1);
+			Sorte associe;
+			LinkedList<Sorte> liste1 = new LinkedList<Sorte>(), liste2 = new LinkedList<Sorte>();
+			liste1.add(s1);
+			if(liste.size() > 1)
+			{
+				associe = liste.getFirst();
+				int minLocal = s1.getNbAssociations(associe);
+				for(Sorte s: liste)
+				{
+					int i = s1.getNbAssociations(s);
+					if(i < minLocal)
+					{
+						minLocal = i;
+						associe = s;
+					}
+				}
+				liste.remove(associe);
+				liste1.add(associe);
+			}
+			Sorte s2 = Collections.min(liste, comp);
+			liste.remove(s2);
+			liste2.add(s2);
+			if(liste.size()>0)
+			{
+				associe = liste.getFirst();
+				int minLocal = s2.getNbAssociations(associe);
+				for(Sorte s: liste)
+				{
+					int i = s2.getNbAssociations(s);
+					if(i < minLocal)
+					{
+						minLocal = i;
+						associe = s;
+					}
+				}
+				liste.remove(associe);
+				liste2.add(associe);
+			}
+			
+			/*Sorte s1 = Collections.min(liste);
+			liste.remove(s1);
+			Sorte s2 = Collections.min(liste);
+			liste.remove(s2);*/
+			
+			/*LinkedList<Sorte> liste1 = new LinkedList<Sorte>(), liste2 = new LinkedList<Sorte>();
+			liste1.add(s1);
+			liste2.add(s2);*/
+			
+			for(Sorte s: liste)
+			{
+				if(s.getNbAssociations(s1) < s.getNbAssociations(s2)) liste1.add(s);
+				else liste2.add(s);
+				
+			}
+			ArbreCliques a1 = rechercherCliquesDPR(liste1);
+			ArbreCliques a2 = rechercherCliquesDPR(liste2);
+			a1.fusionner(a2);
+			a1.setHauteur(a1.getHauteur() + a2.getHauteur());
+			a1.nettoyer();
+			return a1;
+		}
+		
 	}
 }
