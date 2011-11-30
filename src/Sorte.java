@@ -135,6 +135,11 @@ public class Sorte implements Comparable<Sorte>
 		else return 1;
 	}
 	
+	/**
+	 * nombre d'associations entre la sorte courante et la sorte passée en paramètre
+	 * @param s
+	 * @return
+	 */
 	public int getNbAssociations(Sorte s)
 	{
 		int res = 0;
@@ -148,6 +153,10 @@ public class Sorte implements Comparable<Sorte>
 		return res;
 	}
 	
+	/**
+	 * fait la somme des associations par sorte, et renvoie la plus petite somme
+	 * @return
+	 */
 	public int getNbAssociationsMin()
 	{
 		LinkedList<Sorte> listeSortes = this.graphe.getListeSortes();

@@ -38,14 +38,14 @@ public class Graphe {
 		System.out.println("Frappes supprimées. Recherche des n-cliques...");
 		//g.reverseSortes();
 		g.trierSortes("rand");
-		g.trierSortesOptimal("minMinNbRelations", "doubleMin");
+		g.trierSortesOptimal("minMinNbRelations", "moyenne");
 		Date datedeb = new Date();
 		//g.rechercherCliquesDPR();
 		g.rechercherCliques();
 		Date datefin = new Date();
 		long duree = datefin.getTime() - datedeb.getTime();
 		System.out.println("cliques trouvées en: " + duree);
-		//System.out.println(g.afficherCliques());
+		System.out.println(g.afficherCliques());
 	}
 	/**
 	 * @return the listeSortes
@@ -284,7 +284,7 @@ public class Graphe {
 				{
 					it.next();
 				}
-				for(int j=i+1;j<listeSortes.size();j++)
+				while(it.hasNext())
 				{
 					Sorte s2 = it.next();
 					if(s2 != s1)
@@ -425,6 +425,11 @@ public class Graphe {
 		trierSortes2(listeTemp, critereTri);
 	}
 	
+	/**
+	 * renvoie la sorte à insérer dans l'arbre, quand onutilise le critère du double minimum
+	 * @param listeTemp
+	 * @return
+	 */
 	protected Sorte sorteAInsererDoubleMin(LinkedList<Sorte> listeTemp) 
 	{
 		Sorte res = listeSortes.getFirst();
@@ -449,6 +454,12 @@ public class Graphe {
 		return res;
 	}
 	
+	/**
+	 * renvoie la sorte à insérer dans l'arbre, quand onutilise le critère du double minimum,<br/>
+	 * appliqué uniquement sur les premières sortes
+	 * @param listeTemp
+	 * @return
+	 */
 	protected Sorte sorteAInsererDoubleMinLimite(LinkedList<Sorte> listeTemp) 
 	{
 		int limite = Math.min(listeTemp.size(), (listeTemp.size() + listeSortes.size())/5);
@@ -478,6 +489,11 @@ public class Graphe {
 		return res;
 	}
 	
+	/**
+	 * renvoie la sorte à insérer dans l'arbre, quand onutilise le critère du minimum simple
+	 * @param sorte
+	 * @return
+	 */
 	protected Sorte sorteAInsererSimpleMin(Sorte sorte) 
 	{
 		Sorte res = listeSortes.getFirst();
@@ -497,6 +513,12 @@ public class Graphe {
 		}
 		return res;
 	}
+	
+	/**
+	 * renvoie la sorte à insérer dans l'arbre, quand onutilise le critère de la moyenne
+	 * @param listeTemp
+	 * @return
+	 */
 	protected Sorte sorteAInsererMoyenne(LinkedList<Sorte> listeTemp) 
 	{
 		Sorte res = listeSortes.getFirst();
@@ -534,10 +556,20 @@ public class Graphe {
 			}
 		}
 	}
+	
+	/**
+	 * appelle la fonction de recherche en diviser pour régner
+	 */
 	public void rechercherCliquesDPR()
 	{
 		arbre = rechercherCliquesDPR(new LinkedList<Sorte>(listeSortes));
 	}
+	
+	/**
+	 * algo. de recherche des cliques, de type diviser pour régner
+	 * @param liste
+	 * @return
+	 */
 	protected ArbreCliques rechercherCliquesDPR(LinkedList<Sorte> liste)
 	{
 		if(liste.size() == 1)

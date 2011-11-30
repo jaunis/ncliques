@@ -205,7 +205,12 @@ public class ArbreCliques
 	{
 		nettoyer(hauteur);
 	}
-
+	
+	/**
+	 * fusionner deux arbres, en supprimant les processus qui ne conviennent pas
+	 * @param a
+	 * @throws InvalidParameterException
+	 */
 	public void fusionner(ArbreCliques a) throws InvalidParameterException
 	{
 		if(a.getValeur()!=null) 
@@ -226,7 +231,13 @@ public class ArbreCliques
 			}
 		}
 	}
-
+	
+	/**
+	 * teste si le processus passé en paramètre peut être inséré dans l'arbre courant
+	 * @param valeur2
+	 * @return
+	 * @throws InvalidParameterException
+	 */
 	protected boolean accepte(Processus valeur2) throws InvalidParameterException
 	{
 		if(valeur2 == null)

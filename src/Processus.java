@@ -106,16 +106,28 @@ public class Processus
 		this.numero = numero;
 	}
 	
+	/**
+	 * ajouter une association dans la liste des associations
+	 * @param p
+	 */
 	public void addAssociation(Processus p)
 	{
 		listeAssociations.add(p);
 	}
 	
+	/**
+	 * ajouter une frappe dans la liste des frappes
+	 * @param p
+	 */
 	public void addHit(Processus p)
 	{
 		listeHits.add(p);
 	}
 	
+	/**
+	 * teste si le processus a au moins un lien avec chacune des sortes
+	 * @return
+	 */
 	public boolean estValide()
 	{
 		int tailleGraphe = sorte.getGraphe().getListeSortes().size();
@@ -142,6 +154,12 @@ public class Processus
 		}
 	}
 	
+	/**
+	 * teste si le processus en cours est lié avec le processus passé en paramètre.<br/>
+	 * (optimisé, de façon à ne pas faire un contains(p) à chaque fois.
+	 * @param p
+	 * @return
+	 */
 	public boolean accepte(Processus p)
 	{
 		if(accepte == p) return true;
