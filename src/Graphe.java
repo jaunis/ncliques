@@ -22,20 +22,20 @@ public class Graphe {
 	protected ArbreCliques arbre = new ArbreCliques();
 		
 	/**
-	 * bons résultats avec moyenne
+	 * bons rï¿½sultats avec moyenne
 	 * @param args
 	 */
 	public static void main(String[] args) 
 	{
 		Graphe g = new Graphe();
 		g.chargerGraphe("src/graphes/egfr20_tcrsig40_flat.ph");
-		System.out.println("Graphe chargé. Calcul du HitlessGraph...");
+		System.out.println("Graphe chargÃ©. Calcul du HitlessGraph...");
 		g.getHitlessGraph();
-		System.out.println("HitlessGraph calculé. Nettoyage...");
+		System.out.println("HitlessGraph calculÃ©. Nettoyage...");
 		g.nettoyerGraphe();
-		System.out.println("HitlessGraph nettoyé. Suppression des listes de frappes...");
+		System.out.println("HitlessGraph nettoyÃ©. Suppression des listes de frappes...");
 		g.supprimerHits();
-		System.out.println("Frappes supprimées. Recherche des n-cliques...");
+		System.out.println("Frappes supprimÃ©es. Recherche des n-cliques...");
 		//g.reverseSortes();
 		g.trierSortes("rand");
 		g.trierSortesOptimal("minMinNbRelations", "moyenne");
@@ -44,7 +44,7 @@ public class Graphe {
 		g.rechercherCliques();
 		Date datefin = new Date();
 		long duree = datefin.getTime() - datedeb.getTime();
-		System.out.println("cliques trouvées en: " + duree);
+		System.out.println("cliques trouvÃ©es en: " + duree);
 		System.out.println(g.afficherCliques());
 	}
 	/**
@@ -109,7 +109,7 @@ public class Graphe {
 	
 	/**
 	 * supprime du HitlessGraph les Processus n'ayant pas une association avec chaque Sorte<br/>
-	 * <b>Prérequis: </b> Le HitlessGraph a déjà été calculé
+	 * <b>Prï¿½requis: </b> Le HitlessGraph a dï¿½jï¿½ ï¿½tï¿½ calculï¿½
 	 */
 	public void nettoyerGraphe()
 	{
@@ -126,7 +126,7 @@ public class Graphe {
 	}
 	/**
 	 * Calcule la liste des cliques<br/>
-	 * <b>Prérequis:</b> le HitlessGraph a déjà été nettoyé
+	 * <b>Prï¿½requis:</b> le HitlessGraph a dï¿½jï¿½ ï¿½tï¿½ nettoyï¿½
 	 */
 	public void rechercherCliques()
 	{
@@ -134,7 +134,7 @@ public class Graphe {
 	}
 	
 	/**
-	 * méthode appelée par par rechercherCliques()
+	 * mï¿½thode appelï¿½e par par rechercherCliques()
 	 * @param liste
 	 */
 	protected void rechercherCliques(LinkedList<Sorte> liste)
@@ -163,7 +163,7 @@ public class Graphe {
 	}
 	
 	/**
-	 * charge le graphe contenu dans le fichier .ph passé en paramètre
+	 * charge le graphe contenu dans le fichier .ph passï¿½ en paramï¿½tre
 	 * @param nomFichier
 	 */
 	public void chargerGraphe(String nomFichier)
@@ -241,7 +241,7 @@ public class Graphe {
 		
 	}
 	/**
-	 * récupère une Sorte à l'aide de son nom
+	 * rï¿½cupï¿½re une Sorte ï¿½ l'aide de son nom
 	 * @param nom
 	 * @return
 	 */
@@ -267,7 +267,7 @@ public class Graphe {
 		}
 	}
 	/**
-	 * Calcule le HitlessGraph à partir de la liste des frappes
+	 * Calcule le HitlessGraph ï¿½ partir de la liste des frappes
 	 */
 	public void getHitlessGraph()
 	{
@@ -278,7 +278,7 @@ public class Graphe {
 			{
 				Iterator<Sorte> it = listeSortes.iterator();
 				/*
-				 * positionnement de l'itérateur à l'indice i+1
+				 * positionnement de l'itï¿½rateur ï¿½ l'indice i+1
 				 */
 				for(int j=0;j<i+1;j++)
 				{
@@ -314,14 +314,14 @@ public class Graphe {
 		
 	
 	/**
-	 * Trie la liste de Sortes par ordre aléatoire (sens="rand"), croissant (sens="asc")
-	 * ou décroissant (sens="desc")
+	 * Trie la liste de Sortes par ordre alï¿½atoire (sens="rand"), croissant (sens="asc")
+	 * ou dï¿½croissant (sens="desc")
 	 * @param sens
 	 * @throws InvalidParameterException
 	 */
 	public void trierSortes(String sens) throws InvalidParameterException
 	{
-		if(!(sens.equals("asc")||sens.equals("desc")||sens.equals("rand"))) throw new InvalidParameterException("Entrez \"rand\", \"asc\" ou \"desc\" en paramètre.");
+		if(!(sens.equals("asc")||sens.equals("desc")||sens.equals("rand"))) throw new InvalidParameterException("Entrez \"rand\", \"asc\" ou \"desc\" en paramï¿½tre.");
 		if(sens.equals("rand")) Collections.shuffle(listeSortes);
 		else
 		{
@@ -331,8 +331,8 @@ public class Graphe {
 	}
 	
 	/**
-	 * peut être appelée avec une LinkedList contenant une et une seule Sorte.<br/>
-	 * La Sorte précitée doit avoir été supprimée de listeSortes.
+	 * peut ï¿½tre appelï¿½e avec une LinkedList contenant une et une seule Sorte.<br/>
+	 * La Sorte prï¿½citï¿½e doit avoir ï¿½tï¿½ supprimï¿½e de listeSortes.
 	 * @param listeAmorcee
 	 * @param critere
 	 * @throws InvalidParameterException
@@ -344,7 +344,7 @@ public class Graphe {
 		listeCriteres.add("moyenne");
 		listeCriteres.add("simpleMin");
 		listeCriteres.add("doubleMinLimite");
-		if(listeAmorcee.size() != 1) throw new InvalidParameterException("La première sorte doit être préalablement insérée.");
+		if(listeAmorcee.size() != 1) throw new InvalidParameterException("La premiï¿½re sorte doit ï¿½tre prï¿½alablement insï¿½rï¿½e.");
 		else
 		{
 			Sorte min;
@@ -354,7 +354,7 @@ public class Graphe {
 				else if(critere.equals("moyenne")) min = sorteAInsererMoyenne(listeAmorcee);
 				else if(critere.equals("simpleMin")) min = sorteAInsererSimpleMin(listeAmorcee.getFirst());
 				else if(critere.equals("doubleMinLimite")) min = sorteAInsererDoubleMinLimite(listeAmorcee);
-				else throw new InvalidParameterException("Le critère de tri doit être égal à " + listeCriteres);
+				else throw new InvalidParameterException("Le critï¿½re de tri doit ï¿½tre ï¿½gal ï¿½ " + listeCriteres);
 				listeAmorcee.add(min);
 				listeSortes.remove(min);
 			}
@@ -364,17 +364,17 @@ public class Graphe {
 	
 	
 	/**
-	 * La condition initiale détermine la façon dont est choisie la première sorte:<br/>
-	 * <b>minSommeRelations</b> = elle possède la plus petite somme de relations<br/>
-	 * <b>minNbProcessus</b> = elle possède le nombre minimum de processus<br/>
+	 * La condition initiale dï¿½termine la faï¿½on dont est choisie la premiï¿½re sorte:<br/>
+	 * <b>minSommeRelations</b> = elle possï¿½de la plus petite somme de relations<br/>
+	 * <b>minNbProcessus</b> = elle possï¿½de le nombre minimum de processus<br/>
 	 * <b>minMinNbRelations</b> = le nombre de relations minimum qu'elle a avec les autres sortes est<br/>
 	 *  le plus petit de tout le graphe.<br/><br/>
 	 *  
-	 *  Le critère de tri détermine la façon dont sont insérées les sortes suivantes:<br/>
+	 *  Le critï¿½re de tri dï¿½termine la faï¿½on dont sont insï¿½rï¿½es les sortes suivantes:<br/>
 	 *  <b>doubleMin</b> = de toutes les sortes, celles qui a le minimum de relations avec une des<br/>
-	 *  sortes déjà insérées<br/>
+	 *  sortes dï¿½jï¿½ insï¿½rï¿½es<br/>
 	 *  <b>moyenne</b> = de toutes les sortes, celle dont la moyenne du nombre de relations est la plus faible<br/>
-	 *  <b>simpleMin</b> = de toutes les sortes, celle qui a le moins de relations avec le premier élément
+	 *  <b>simpleMin</b> = de toutes les sortes, celle qui a le moins de relations avec le premier ï¿½lï¿½ment
 	 * @param conditionInitiale : minSommeRelations, minNbProcessus, minMinNbRelations
 	 * @param critereTri : doubleMin, moyenne, simpleMin
 	 * @throws InvalidParameterException
@@ -419,14 +419,14 @@ public class Graphe {
 			};
 			min = Collections.min(listeSortes, comp);
 		}
-		else throw new InvalidParameterException("Le critère doit être égal à " + listeCI);
+		else throw new InvalidParameterException("Le critï¿½re doit ï¿½tre ï¿½gal ï¿½ " + listeCI);
 		listeTemp.add(min);
 		listeSortes.remove(min);
 		trierSortes2(listeTemp, critereTri);
 	}
 	
 	/**
-	 * renvoie la sorte à insérer dans l'arbre, quand onutilise le critère du double minimum
+	 * renvoie la sorte ï¿½ insï¿½rer dans l'arbre, quand onutilise le critï¿½re du double minimum
 	 * @param listeTemp
 	 * @return
 	 */
@@ -455,8 +455,8 @@ public class Graphe {
 	}
 	
 	/**
-	 * renvoie la sorte à insérer dans l'arbre, quand onutilise le critère du double minimum,<br/>
-	 * appliqué uniquement sur les premières sortes
+	 * renvoie la sorte ï¿½ insï¿½rer dans l'arbre, quand onutilise le critï¿½re du double minimum,<br/>
+	 * appliquï¿½ uniquement sur les premiï¿½res sortes
 	 * @param listeTemp
 	 * @return
 	 */
@@ -490,7 +490,7 @@ public class Graphe {
 	}
 	
 	/**
-	 * renvoie la sorte à insérer dans l'arbre, quand onutilise le critère du minimum simple
+	 * renvoie la sorte ï¿½ insï¿½rer dans l'arbre, quand onutilise le critï¿½re du minimum simple
 	 * @param sorte
 	 * @return
 	 */
@@ -515,7 +515,7 @@ public class Graphe {
 	}
 	
 	/**
-	 * renvoie la sorte à insérer dans l'arbre, quand onutilise le critère de la moyenne
+	 * renvoie la sorte ï¿½ insï¿½rer dans l'arbre, quand onutilise le critï¿½re de la moyenne
 	 * @param listeTemp
 	 * @return
 	 */
@@ -544,7 +544,7 @@ public class Graphe {
 		return res;
 	}
 	/**
-	 * supprime les listes de frappe pour libérer de la mémoire
+	 * supprime les listes de frappe pour libï¿½rer de la mï¿½moire
 	 */
 	public void supprimerHits()
 	{
@@ -558,7 +558,7 @@ public class Graphe {
 	}
 	
 	/**
-	 * appelle la fonction de recherche en diviser pour régner
+	 * appelle la fonction de recherche en diviser pour rï¿½gner
 	 */
 	public void rechercherCliquesDPR()
 	{
@@ -566,7 +566,7 @@ public class Graphe {
 	}
 	
 	/**
-	 * algo. de recherche des cliques, de type diviser pour régner
+	 * algo. de recherche des cliques, de type diviser pour rï¿½gner
 	 * @param liste
 	 * @return
 	 */
