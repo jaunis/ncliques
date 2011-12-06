@@ -200,9 +200,9 @@ public class ArbreCliques
 	 */
 	public void addProcessus(Processus p)
 	{
+		ArbreCliques nouveau = new ArbreCliques(p);
 		if(hauteur > 0)
 		{
-			ArbreCliques nouveau = new ArbreCliques(p);
 			for(ArbreCliques a: listeFils)
 			{
 				a.addProcessus(nouveau, hauteur - 1);
@@ -210,12 +210,12 @@ public class ArbreCliques
 			nettoyer1(nouveau);
 			reset1();
 		}
-		else listeFils.add(new ArbreCliques(p));
+		else listeFils.add(nouveau);
 	}
 	
 	/**
-	 * fonction r�cursive ajoutant un processus dans l'arbre � une profondeur donn�e,<br/>
-	 * en v�rifiant que le processus poss�de une association avec chaque noeud de la branche
+	 * fonction récursive ajoutant un processus dans l'arbre à une profondeur donnée,<br/>
+	 * en vérifiant que le processus possède une association avec chaque noeud de la branche
 	 * @param p
 	 * @param profondeur
 	 */

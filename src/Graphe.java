@@ -22,25 +22,24 @@ public class Graphe {
 	protected ArbreCliques arbre = new ArbreCliques();
 		
 	/**
-	 * bons r�sultats avec moyenne
+	 * bons résultats avec moyenne
 	 * @param args
 	 */
 	public static void main(String[] args) 
 	{
 		Graphe g = new Graphe();
-		g.chargerGraphe("src/graphes/egfr20_flat.ph");
+		//g.chargerGraphe("src/graphes/egfr20_flat.ph");
+		g.chargerGraphe("src/graphes/graphe");
 		System.out.println("Graphe chargé. Calcul du HitlessGraph...");
-		g.getHitlessGraph();
+		//g.getHitlessGraph();
 		System.out.println("HitlessGraph calculé. Nettoyage...");
 		g.nettoyerGraphe();
 		System.out.println("HitlessGraph nettoyé. Suppression des listes de frappes...");
-		g.supprimerHits();
+		//g.supprimerHits();
 		System.out.println("Frappes supprimées. Recherche des n-cliques...");
-		//g.reverseSortes();
-		g.trierSortes("rand");
-		g.trierSortesOptimal("minMinNbRelations", "moyenne");
+		//.trierSortes("rand");
+		//g.trierSortesOptimal("minMinNbRelations", "moyenne");
 		Date datedeb = new Date();
-		//g.rechercherCliquesDPR();
 		g.rechercherCliques();
 		Date datefin = new Date();
 		long duree = datefin.getTime() - datedeb.getTime();
@@ -134,7 +133,7 @@ public class Graphe {
 	}
 	
 	/**
-	 * m�thode appel�e par par rechercherCliques()
+	 * méthode appelée par par rechercherCliques()
 	 * @param liste
 	 */
 	protected void rechercherCliques(LinkedList<Sorte> liste)
@@ -170,7 +169,7 @@ public class Graphe {
 	 */
 	public void chargerGraphe(String nomFichier)
 	{
-		/*try
+		try
 		{
 			InputStream ips=new FileInputStream(nomFichier); 
 			InputStreamReader ipsr=new InputStreamReader(ips);
@@ -198,8 +197,8 @@ public class Graphe {
 		catch(Exception e)
 		{
 			e.printStackTrace();
-		}*/
-		
+		}
+		/*
 		try
 		{
 			InputStream ips=new FileInputStream(nomFichier); 
@@ -239,7 +238,7 @@ public class Graphe {
 		{
 			e.printStackTrace();
 		}
-		
+		*/
 		
 	}
 	/**
