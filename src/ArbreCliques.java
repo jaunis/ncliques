@@ -7,9 +7,13 @@ public class ArbreCliques
 	//valeur du noeud
 	protected Processus valeur = null;
 	//liste des fils
-	protected LinkedList<ArbreCliques> listeFils = new LinkedList<ArbreCliques>();
+	protected LinkedList<ArbreCliques> listeFils = new LinkedList<>();
 	//hauteur: mis à jour uniquement pour la racine de l'arbre
 	protected int hauteur = 0;
+	protected LinkedList<ArbreCliques> listePeres = new LinkedList<>();
+	protected ArbreCliques accepte;
+	protected boolean nettoye1;
+	protected boolean nettoye2;
 	
 	public ArbreCliques(Processus p) {
 		this.valeur = p;
@@ -29,6 +33,63 @@ public class ArbreCliques
 				listeFils.add(new ArbreCliques(f));
 			}
 		}
+		listePeres = a.getListePeres();
+	}
+
+	/**
+	 * @return the listePeres
+	 */
+	public LinkedList<ArbreCliques> getListePeres() {
+		return listePeres;
+	}
+
+	/**
+	 * @param listePeres the listePeres to set
+	 */
+	public void setListePeres(LinkedList<ArbreCliques> listePeres) {
+		this.listePeres = listePeres;
+	}
+
+	/**
+	 * @return the valide
+	 */
+	public ArbreCliques getAccepte() {
+		return accepte;
+	}
+
+	/**
+	 * @param valide the valide to set
+	 */
+	public void setAccepte(ArbreCliques accepte) {
+		this.accepte = accepte;
+	}
+
+	/**
+	 * @return the nettoye1
+	 */
+	public boolean isNettoye1() {
+		return nettoye1;
+	}
+
+	/**
+	 * @param nettoye1 the nettoye1 to set
+	 */
+	public void setNettoye1(boolean nettoye1) {
+		this.nettoye1 = nettoye1;
+	}
+
+	/**
+	 * @return the nettoye2
+	 */
+	public boolean isNettoye2() {
+		return nettoye2;
+	}
+
+	/**
+	 * @param nettoye2 the nettoye2 to set
+	 */
+	public void setNettoye2(boolean nettoye2) {
+		this.nettoye2 = nettoye2;
 	}
 
 	/**
@@ -141,10 +202,13 @@ public class ArbreCliques
 	{
 		if(hauteur > 0)
 		{
+			ArbreCliques nouveau = new ArbreCliques(p);
 			for(ArbreCliques a: listeFils)
 			{
-				a.addProcessus(p, hauteur - 1);
+				a.addProcessus(nouveau, hauteur - 1);
 			}
+			nettoyer1(nouveau);
+			reset1();
 		}
 		else listeFils.add(new ArbreCliques(p));
 	}
@@ -155,28 +219,93 @@ public class ArbreCliques
 	 * @param p
 	 * @param profondeur
 	 */
-	protected void addProcessus(Processus p, int profondeur)
+	protected void addProcessus(ArbreCliques nouveau, int profondeur)
 	{
-		if(valeur.accepte(p))
+		/*
+		 * si l'arbre est déjà "marqué" par nouveau (accepte == nouveau)
+		 * alors tout ce qui suit a déjà été validé donc on s'arrête
+		 * 
+		 * sinon, si le processus est accepté, on marque l'arbre
+		 * et on valide récursivement
+		 */
+		if((accepte != nouveau) && valeur.accepte(nouveau.getValeur()))
 		{
-			if(profondeur == 0) listeFils.add(new ArbreCliques(p));
+			
+			accepte = nouveau;
+			if(profondeur == 0)
+			{
+				listeFils.add(nouveau);
+				nouveau.getListePeres().add(this);
+			}
 			else
 			{
 				for(ArbreCliques a: listeFils)
 				{
-					a.addProcessus(p, profondeur - 1);
+					a.addProcessus(nouveau, profondeur - 1);
+				}
+			}
+			
+		}
+		
+	}
+	
+	protected void nettoyer1(ArbreCliques nouveau)
+	{
+		if((!nettoye1 && this != nouveau && accepte == nouveau) || valeur == null)
+		{
+			if(listePeres.size() > 1)
+			{
+				LinkedList<ArbreCliques> listePeresValidant = new LinkedList<>();
+				LinkedList<ArbreCliques> listePeresInvalidant = new LinkedList<>();
+				for(ArbreCliques p: listePeres)
+				{
+					if(p.getAccepte() == nouveau) listePeresValidant.add(p);
+					else listePeresInvalidant.add(p);
+				}
+				listePeres = listePeresValidant;
+				ArbreCliques dupliquat = new ArbreCliques(this);
+				dupliquat.setListePeres(listePeresInvalidant);
+				for(ArbreCliques p: listePeresInvalidant)
+				{
+					p.getListeFils().remove(this);
+					p.getListeFils().add(dupliquat);
+				}
+				dupliquat.supprimer(nouveau);
+			}
+			nettoye1 = true;
+			if(!estFeuille())
+			{
+				for(ArbreCliques f: listeFils)
+				{
+					f.nettoyer1(nouveau);
+				}
+			}
+		}
+		
+	}
+	
+	private void supprimer(ArbreCliques nouveau) 
+	{
+		if(!estFeuille())
+		{
+			listeFils.remove(nouveau);
+			if(!estFeuille())
+			{
+				for(ArbreCliques f: listeFils)
+				{
+					f.supprimer(nouveau);
 				}
 			}
 		}
 	}
-	
+
 	/**
-	 * supprime les branches de profondeur inf�rieure � la valeur pass�e en param�tre
+	 * supprime les branches de profondeur inférieure à la valeur passée en paramètre
 	 * @param profondeur
 	 */
-	protected void nettoyer(int profondeur)
+	protected void nettoyer2(int profondeur)
 	{
-		if(!estFeuille())
+		if(!estFeuille() && !nettoye2)
 		{
 			ArbreCliques[] listeSuppression = new ArbreCliques[listeFils.size()];
 			int i=0;
@@ -187,13 +316,14 @@ public class ArbreCliques
 					listeSuppression[i] = a;
 					i++;
 				}
-				else a.nettoyer(profondeur - 1);
+				else a.nettoyer2(profondeur - 1);
 			}
 			int j=0;
 			for(j=0; j<i; j++)
 			{
 				listeFils.remove(listeSuppression[j]);
 			}
+			nettoye2 = true;
 		}
 		
 	}
@@ -201,9 +331,9 @@ public class ArbreCliques
 	/**
 	 * appelle nettoyer(int)
 	 */
-	public void nettoyer()
+	public void nettoyer2()
 	{
-		nettoyer(hauteur);
+		nettoyer2(hauteur);
 	}
 	
 	/**
@@ -272,17 +402,32 @@ public class ArbreCliques
 		}
 	}
 	
-	public ArbreCliques dupliquer()
+	/**
+	 * met à false toutes les occurences de nettoye1 dans l'arbre
+	 */
+	public void reset1()
 	{
-		if(estFeuille()) return new ArbreCliques(this.valeur);
-		else
+		if(nettoye1 || valeur == null)
 		{
-			ArbreCliques copie = new ArbreCliques(this.valeur);
-			for(ArbreCliques a: listeFils)
+			nettoye1 = false;
+			for(ArbreCliques f: listeFils)
 			{
-				copie.getListeFils().add(a.dupliquer());
+				f.reset1();
 			}
-			return copie;
+		}
+	}
+	/**
+	 * met à false toutes les occurences de nettoye2 dans l'arbre
+	 */
+	public void reset2()
+	{
+		if(nettoye2 || valeur == null)
+		{
+			nettoye2 = false;
+			for(ArbreCliques f: listeFils)
+			{
+				f.reset2();
+			}
 		}
 	}
 }
