@@ -144,6 +144,7 @@ public class Graphe {
 			Sorte first = liste.removeFirst();
 			ajouterSorte(first);
 			System.out.println(liste.size());
+			System.out.println(arbre.getProfondeurMax());
 			rechercherCliques(liste);	
 		}
 		
