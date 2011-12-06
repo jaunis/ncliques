@@ -8,7 +8,7 @@ public class ArbreCliques
 	protected Processus valeur = null;
 	//liste des fils
 	protected LinkedList<ArbreCliques> listeFils = new LinkedList<ArbreCliques>();
-	//hauteur: mis à jour uniquement pour la racine de l'arbre
+	//hauteur: mis Ã  jour uniquement pour la racine de l'arbre
 	protected int hauteur = 0;
 	
 	public ArbreCliques(Processus p) {
@@ -69,7 +69,7 @@ public class ArbreCliques
 	}
 	
 	/**
-	 * fonction récursive appelée par toString()
+	 * fonction rï¿½cursive appelï¿½e par toString()
 	 * @param chaine
 	 * @return
 	 */
@@ -103,7 +103,7 @@ public class ArbreCliques
 	}
 	
 	/**
-	 * teste si l'élément est une feuille
+	 * teste si l'ï¿½lï¿½ment est une feuille
 	 * @return
 	 */
 	public boolean estFeuille()
@@ -112,7 +112,7 @@ public class ArbreCliques
 	}
 	
 	/**
-	 * fonction récursive calculant la profondeur maximum de l'arbre
+	 * fonction rï¿½cursive calculant la profondeur maximum de l'arbre
 	 * @return
 	 */
 	public int getProfondeurMax()
@@ -134,7 +134,7 @@ public class ArbreCliques
 	}
 	
 	/**
-	 * appelle addProcessus(Processus, int) pour insérer le processus au bon endroit dans l'arbre
+	 * appelle addProcessus(Processus, int) pour insï¿½rer le processus au bon endroit dans l'arbre
 	 * @param p
 	 */
 	public void addProcessus(Processus p)
@@ -150,8 +150,8 @@ public class ArbreCliques
 	}
 	
 	/**
-	 * fonction récursive ajoutant un processus dans l'arbre à une profondeur donnée,<br/>
-	 * en vérifiant que le processus possède une association avec chaque noeud de la branche
+	 * fonction rï¿½cursive ajoutant un processus dans l'arbre ï¿½ une profondeur donnï¿½e,<br/>
+	 * en vï¿½rifiant que le processus possï¿½de une association avec chaque noeud de la branche
 	 * @param p
 	 * @param profondeur
 	 */
@@ -171,7 +171,7 @@ public class ArbreCliques
 	}
 	
 	/**
-	 * supprime les branches de profondeur inférieure à la valeur passée en paramètre
+	 * supprime les branches de profondeur infï¿½rieure ï¿½ la valeur passï¿½e en paramï¿½tre
 	 * @param profondeur
 	 */
 	protected void nettoyer(int profondeur)
@@ -214,7 +214,7 @@ public class ArbreCliques
 	public void fusionner(ArbreCliques a) throws InvalidParameterException
 	{
 		if(a.getValeur()!=null) 
-			throw new InvalidParameterException("Il faut passer un arbre complet en paramètre (racine nulle)");
+			throw new InvalidParameterException("Il faut passer un arbre complet en paramï¿½tre (racine nulle)");
 		
 		ArbreCliques copie = new ArbreCliques(a);
 		boolean valide = true;
@@ -233,7 +233,7 @@ public class ArbreCliques
 	}
 	
 	/**
-	 * teste si le processus passé en paramètre peut être inséré dans l'arbre courant
+	 * teste si le processus passÃ© en paramÃ¨tre peut Ãªtre insÃ©rÃ© dans l'arbre courant
 	 * @param valeur2
 	 * @return
 	 * @throws InvalidParameterException
@@ -241,7 +241,7 @@ public class ArbreCliques
 	protected boolean accepte(Processus valeur2) throws InvalidParameterException
 	{
 		if(valeur2 == null)
-			throw new InvalidParameterException("Impossible de passer une valeur nulle en paramètre.");
+			throw new InvalidParameterException("Impossible de passer une valeur nulle en paramï¿½tre.");
 		if(valeur == null && estFeuille()) return true;
 		else if(estFeuille()) return (valeur.getListeAssociations().contains(valeur2));
 		else

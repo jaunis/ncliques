@@ -131,7 +131,7 @@ public class Processus
 	public boolean estValide()
 	{
 		int tailleGraphe = sorte.getGraphe().getListeSortes().size();
-		if(listeAssociations.size()<tailleGraphe-1) return false;
+		if(listeAssociations.size()<tailleGraphe-2) return false;
 		else
 		{
 			LinkedList<Sorte> listeSortesLiees = new LinkedList<Sorte>();
@@ -146,17 +146,17 @@ public class Processus
 				{
 					listeSortesLiees.add(s);
 					taille++;
-					if(taille==tailleGraphe-1) cont=false;
+					if(taille==tailleGraphe-2) cont=false;
 				}
 				cont &= i.hasNext();
 			}
-			return (taille==tailleGraphe - 1); 
+			return (taille==tailleGraphe - 2); 
 		}
 	}
 	
 	/**
-	 * teste si le processus en cours est lié avec le processus passé en paramètre.<br/>
-	 * (optimisé, de façon à ne pas faire un contains(p) à chaque fois.
+	 * teste si le processus en cours est liÃ© avec le processus passÃ© en paramÃ¨tre.<br/>
+	 * (optimisÃ©, de faÃ§on Ã  ne pas faire un contains(p) Ã  chaque fois.
 	 * @param p
 	 * @return
 	 */
