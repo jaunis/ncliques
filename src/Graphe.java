@@ -23,7 +23,7 @@ public class Graphe {
 		g.chargerGraphe("src/graphes/tcrsig40_flat.ph");
 		System.out.println("Graphe charg�. Calcul du HitlessGraph...");
 		g.getHitlessGraph();
-		System.out.println("HitlessGraph calcul�. Nettoyage...");
+		System.out.println("HitlessGraph calculé. Nettoyage...");
 		g.nettoyerGraphe();
 		System.out.println("HitlessGraph nettoyé. Suppression des listes de frappes...");
 		g.supprimerHits();
@@ -37,7 +37,7 @@ public class Graphe {
 		g.rechercherCliques();
 		Date datefin = new Date();
 		long duree = datefin.getTime() - datedeb.getTime();
-		System.out.println("cliques trouv�es en: " + duree);
+		System.out.println("cliques trouvées en: " + duree);
 		System.out.println(g.afficherCliques());
 	}
 	/**
