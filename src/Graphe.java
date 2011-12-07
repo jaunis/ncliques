@@ -19,6 +19,7 @@ public class Graphe {
 	protected LinkedList<Clique> listeCliques = new LinkedList<Clique>();
 		
 	/**
+	 * essai changement
 	 * @param args
 	 */
 	public static void main(String[] args) 
