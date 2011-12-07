@@ -11,17 +11,24 @@ import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
+//TODO: rechercher les n-1 cliques et pas les n cliques
+/**
+ * @author Jean AUNIS
+ *
+ */
 public class Graphe {
 
 	protected LinkedList<Sorte> listeSortes = new LinkedList<Sorte>();
 	protected LinkedList<Clique> listeCliques = new LinkedList<Clique>();
 		
+	/**
+	 * @param args
+	 */
 	public static void main(String[] args) 
 	{
 		Graphe g = new Graphe();
 		g.chargerGraphe("src/graphes/tcrsig40_flat.ph");
-		System.out.println("Graphe charg�. Calcul du HitlessGraph...");
+		System.out.println("Graphe chargé. Calcul du HitlessGraph...");
 		g.getHitlessGraph();
 		System.out.println("HitlessGraph calculé. Nettoyage...");
 		g.nettoyerGraphe();
@@ -64,7 +71,12 @@ public class Graphe {
 	public void setListeCliques(LinkedList<Clique> listeCliques) {
 		this.listeCliques = listeCliques;
 	}
-	
+	/**
+	 * affiche l'arbre sous la forme suivante:<br/>
+	 * nom_sorte{noms_processus}<br/>
+	 * nom_processus:<br/>
+	 * liste_associations
+	 */
 	public String toString()
 	{
 		String res = "";
@@ -85,6 +97,10 @@ public class Graphe {
 		return res;
 	}
 	
+	/**
+	 * affiche la liste des cliques (1 clique par ligne)
+	 * @return
+	 */
 	public String afficherCliques()
 	{
 		String res = "";
@@ -95,6 +111,10 @@ public class Graphe {
 		return res;
 	}
 	
+	/**
+	 * supprime du HitlessGraph les Processus n'ayant pas une association avec chaque Sorte<br/>
+	 * <b>Prérequis: </b> Le HitlessGraph a déjà été calculé
+	 */
 	public void nettoyerGraphe()
 	{
 		boolean cont = true;
@@ -109,12 +129,25 @@ public class Graphe {
 		
 	}
 	
+	/**
+	 * Calcule la liste des cliques<br/>
+	 * <b>Pr�requis:</b> le HitlessGraph a d�j� �t� nettoy�
+	 */
 	public void rechercherCliques()
 	{
 		rechercherCliques(new LinkedList<Sorte>(this.listeSortes));
 	}
-	public void rechercherCliques(LinkedList<Sorte> liste)
+	
+	/**
+	 * méthode appelée par par rechercherCliques()
+	 * @param liste
+	 *@param liste: la liste de sortes à utiliser
+	 */
+	protected void rechercherCliques(LinkedList<Sorte> liste)
 	{
+		/*
+		 * si la taille est de 1, chaque processus pris indépendamment constitue une clique
+		 */
 		if(liste.size() == 1)
 		{
 			for(Processus p: liste.getFirst().getListeProcessus())
@@ -125,6 +158,10 @@ public class Graphe {
 			}
 			
 		}
+		/*
+		 * sinon on dépile la première sorte, on recherche les cliques dans la liste ainsi réduite
+		 * et on insère la sorte dans la liste des cliques trouvée
+		 */
 		else
 		{
 			Sorte first = liste.removeFirst();
@@ -132,19 +169,31 @@ public class Graphe {
 			ajouterSorte(first);
 		}
 	}
+	/**
+	 * Ajoute les processus contenus dans la sorte aux cliques déjà calculées
+	 * @param s: la Sorte à ajouter
+	 */
 	public void ajouterSorte(Sorte s)
 	{
-		//System.out.println(listeCliques.size());
+		//nouvelle liste contenant les cliques augmentées d'un processus
 		LinkedList<Clique> listeTemp = new LinkedList<Clique>();
 		for(Processus p1: s.getListeProcessus())
 		{
 			for(Clique c: listeCliques)
 			{
 				boolean convient = true;
+				/*
+				 * pour chaque processus de la clique, on regarde s'il a un lien
+				 * avec le processus en cours de traitement
+				 */
 				for(Processus p2: c.getListeProcessus())
 				{
-					convient = convient && p2.getListeAssociations().contains(p1);
+					convient &= p2.getListeAssociations().contains(p1);
 				}
+				/*
+				 * le processus testé convient s'il a un lien avec chacun des processus de la clique
+				 * Dans ce cas on l'insère, et on ajoute la clique ainsi générée dans listeTemp
+				 */
 				if(convient)
 				{
 					Clique cliqueAugmentee = new Clique(c);
@@ -153,8 +202,15 @@ public class Graphe {
 				}
 			}
 		}
+		//on remplace l'ancienne liste par la nouvelle
 		this.listeCliques = listeTemp;
 	}
+	
+	/**
+	 * charge le graphe contenu dans le fichier .ph pass� en param�tre
+
+	 * @param nomFichier
+	 */
 	public void chargerGraphe(String nomFichier)
 	{
 		/*try
@@ -192,18 +248,29 @@ public class Graphe {
 			InputStreamReader ipsr=new InputStreamReader(ips);
 			BufferedReader br=new BufferedReader(ipsr);
 			String ligne;
+			
+			//expression régulière pour extraire la liste des sortes
 			Pattern p1 = Pattern.compile("^process\\s(.*)\\s(\\d*)$");
+			//expression régulière pour extraire la liste des frappes
 			Pattern p2 = Pattern.compile("^(.*)\\s(\\d*)\\s->\\s([^\\s]*)\\s(\\d*)\\s(\\d*)");
 			while ((ligne=br.readLine())!=null)
 			{
 				Matcher m1 = p1.matcher(ligne.trim());
 				Matcher m2 = p2.matcher(ligne.trim());
+				
+				/*
+				 * m1 correspond, on crée donc une sorte avec le bon nombre de processus
+				 */
 				if(m1.find())
 				{
 					String nom = m1.group(1);
 					int taille = Integer.parseInt(m1.group(2)) + 1;
 					listeSortes.add(new Sorte(nom, this, taille));
 				}
+				
+				/*
+				 * m2 correspond, on ajoute donc une frappe entre deux processus
+				 */
 				else if(m2.find())
 				{
 					String nom1 = m2.group(1);
@@ -229,6 +296,11 @@ public class Graphe {
 		
 	}
 	
+	/**
+	 * récupère une Sorte grâce à son nom
+	 * @param nom: le nom de la Sorte qu'on veut récupérer
+	 * @return 
+	 */
 	public Sorte getSorteByNom(String nom)
 	{
 		boolean cont = true;
@@ -251,6 +323,10 @@ public class Graphe {
 		}
 	}
 	
+	/**
+	 * calcule le HitlessGraph: on crée des associations entre les processus<br/>
+	 * qui ne se "frappent" pas
+	 */
 	public void getHitlessGraph()
 	{
 		int i=0;
@@ -260,13 +336,13 @@ public class Graphe {
 			{
 				Iterator<Sorte> it = listeSortes.iterator();
 				/*
-				 * positionnement de l'it�rateur � l'indice i+1
+				 * positionnement de l'itérateur à l'indice i+1
 				 */
 				for(int j=0;j<i+1;j++)
 				{
 					it.next();
 				}
-				for(int j=i+1;j<listeSortes.size();j++)
+				while(it.hasNext())
 				{
 					Sorte s2 = it.next();
 					if(s2 != s1)

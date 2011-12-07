@@ -1,23 +1,30 @@
 import java.util.LinkedList;
 
-
+/**
+ * Une clique est une liste de processus
+ * @author Jean AUNIS
+ *
+ */
 public class Clique 
 {
 	protected LinkedList<Processus> listeProcessus = new LinkedList<Processus>();
 	
+	//constructeurs
 	public Clique(LinkedList<Processus> liste)
 	{
 		this.listeProcessus = liste;
 	}
 	public Clique(Clique c)
 	{
-		this.listeProcessus = new LinkedList<Processus>();
 		for(Processus p: c.getListeProcessus())
 		{
 			this.listeProcessus.add(p);
 		}
 	}
 	
+	/**
+	 * affiche la liste des processus contenus dans la clique
+	 */
 	public String toString()
 	{
 		String res = "";

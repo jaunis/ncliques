@@ -4,10 +4,18 @@ import java.util.LinkedList;
 
 public class Processus 
 {
+	//liste des associations, dans le HitlessGraph
 	protected LinkedList<Processus> listeAssociations = new LinkedList<Processus>();
+	//liste des frappes de processus
 	protected LinkedList<Processus> listeHits = new LinkedList<Processus>();
+	//Sorte dans laquelle est contenu le processus
 	protected Sorte sorte;
+	//numéro du processus dans la sorte
 	protected int numero;
+	/*
+	 * attributs indiquant si le processus courant a un lien avec un processus donné
+	 * ils permettent d'accélérer la recherche d'un processus dans la liste des associations
+	 */
 	protected Processus accepte;
 	protected Processus rejette;
 	
@@ -125,7 +133,7 @@ public class Processus
 	}
 	
 	/**
-	 * teste si le processus a au moins un lien avec chacune des sortes
+	 * teste si le processus a au moins un lien avec n-1 sortes
 	 * @return
 	 */
 	public boolean estValide()
@@ -134,10 +142,11 @@ public class Processus
 		if(listeAssociations.size()<tailleGraphe-2) return false;
 		else
 		{
-			LinkedList<Sorte> listeSortesLiees = new LinkedList<Sorte>();
+			LinkedList<Sorte> listeSortesLiees = new LinkedList<>();
 			Iterator<Processus> i = listeAssociations.iterator();
 			boolean cont=true;
 			int taille = 0;
+			//on compte les sortes liées à ce processus
 			while(cont)
 			{
 				Processus p = i.next();

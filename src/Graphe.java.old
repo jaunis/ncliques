@@ -210,12 +210,19 @@ public class Graphe {
 			{
 				Matcher m1 = p1.matcher(ligne.trim());
 				Matcher m2 = p2.matcher(ligne.trim());
+				/*
+				 * m1 correspond, on crée donc une sorte avec le bon nombre de processus
+				 */
 				if(m1.find())
 				{
 					String nom = m1.group(1);
 					int taille = Integer.parseInt(m1.group(2)) + 1;
 					listeSortes.add(new Sorte(nom, this, taille));
 				}
+				/*
+				 * m2 correspond, on ajoute donc une frappe entre deux processus
+				 */
+
 				else if(m2.find())
 				{
 					String nom1 = m2.group(1);
@@ -267,7 +274,8 @@ public class Graphe {
 		}
 	}
 	/**
-	 * Calcule le HitlessGraph � partir de la liste des frappes
+	 * calcule le HitlessGraph: on crée des associations entre les processus<br/>
+	 * qui ne se "frappent" pas
 	 */
 	public void getHitlessGraph()
 	{
