@@ -66,7 +66,7 @@ public class Sorte implements Comparable<Sorte>
 	}
 	
 	/**
-	 * supprime les processus qui ne sont pas liés à toutes les autres sortes
+	 * supprime les processus qui ne sont pas liÃ©s Ã  toutes les autres sortes
 	 * @return
 	 */
 	public boolean nettoyerSorte()
@@ -75,7 +75,7 @@ public class Sorte implements Comparable<Sorte>
 		Processus[] tableau = new Processus[listeProcessus.size()];
 		int i=0;
 		/*
-		 * on supprime les processus inutiles à l'aide de 2 boucles for, pour éviter
+		 * on supprime les processus inutiles ï¿½ l'aide de 2 boucles for, pour ï¿½viter
 		 * de lever une ConcurrentModificationException
 		 */
 		for(Processus p: listeProcessus)
@@ -100,7 +100,7 @@ public class Sorte implements Comparable<Sorte>
 	
 	/**
 	 * 
-	 * @param num le numéro du processus à renvoyer
+	 * @param num le numï¿½ro du processus ï¿½ renvoyer
 	 * @return
 	 */
 	public Processus getProcessusByNumero(int num)
@@ -108,7 +108,7 @@ public class Sorte implements Comparable<Sorte>
 		try{return listeProcessus.get(num);}
 		catch(IndexOutOfBoundsException e)
 		{
-			System.err.println("Nom: " + this.nom + "\n" + "Numéro essayé: " + num);
+			System.err.println("Nom: " + this.nom + "\n" + "Numï¿½ro essayï¿½: " + num);
 			e.printStackTrace();
 			return null;
 		}
@@ -136,7 +136,7 @@ public class Sorte implements Comparable<Sorte>
 	}
 	
 	/**
-	 * nombre d'associations entre la sorte courante et la sorte passée en paramètre
+	 * nombre d'associations entre la sorte courante et la sorte passï¿½e en paramï¿½tre
 	 * @param s
 	 * @return
 	 */

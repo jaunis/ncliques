@@ -138,6 +138,7 @@ public class Processus
 			Iterator<Processus> i = listeAssociations.iterator();
 			boolean cont=true;
 			int taille = 0;
+			//on compte le nombre de sortes associÃ©es au processus
 			while(cont)
 			{
 				Processus p = i.next();
@@ -155,8 +156,8 @@ public class Processus
 	}
 	
 	/**
-	 * teste si le processus en cours est lié avec le processus passé en paramètre.<br/>
-	 * (optimisé, de façon à ne pas faire un contains(p) à chaque fois.
+	 * teste si le processus en cours est liï¿½ avec le processus passÃ© en paramÃ¨tre.<br/>
+	 * (optimisÃ©, de faÃ§on Ã  ne pas faire un contains(p) Ã  chaque fois.
 	 * @param p
 	 * @return
 	 */
