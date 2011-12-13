@@ -1,5 +1,8 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Date;
@@ -8,24 +11,26 @@ import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//TODO: rechercher les n-1 cliques et pas les n cliques
 /**
  * @author Jean AUNIS
  *
  */
+@SuppressWarnings("unused")
 public class Graphe {
 
 	protected LinkedList<Sorte> listeSortes = new LinkedList<Sorte>();
-	protected LinkedList<Clique> listeCliques = new LinkedList<Clique>();
-		
+	protected LinkedList<Clique> listeNCliques = new LinkedList<Clique>();
+	protected LinkedList<Clique> listeNmoinsUnCliques = new LinkedList<Clique>();
+	
+	private static String fichierEntree = "egfr20_flat.ph";
+	
 	/**
-	 * essai changement
 	 * @param args
 	 */
 	public static void main(String[] args) 
 	{
 		Graphe g = new Graphe();
-		g.chargerGraphe("src/graphes/tcrsig40_flat.ph");
+		g.chargerGraphe("src/graphes/" + Graphe.fichierEntree);
 		System.out.println("Graphe chargé. Calcul du HitlessGraph...");
 		g.getHitlessGraph();
 		System.out.println("HitlessGraph calculé. Nettoyage...");
@@ -43,7 +48,30 @@ public class Graphe {
 		Date datefin = new Date();
 		long duree = datefin.getTime() - datedeb.getTime();
 		System.out.println("cliques trouvées en: " + duree);
-		System.out.println(g.afficherCliques());
+		boolean coherent = true;
+		int n = g.getListeSortes().size();
+		for(Clique c: g.getListeNmoinsUnCliques())
+		{
+			coherent &= (c.getListeProcessus().size() ==n-1);
+		}
+		if(coherent)
+			System.out.println("Toutes les tailles sont correctes.");
+		else
+			System.out.println("Tailles différentes!");
+		System.out.println("Nombre de n-1-cliques: " + g.getListeNmoinsUnCliques().size());
+	}
+	
+	/**
+	 * @return the listeNmoinsUnCliques
+	 */
+	public LinkedList<Clique> getListeNmoinsUnCliques() {
+		return listeNmoinsUnCliques;
+	}
+	/**
+	 * @param listeNmoinsUnCliques the listeNmoinsUnCliques to set
+	 */
+	public void setListeNmoinsUnCliques(LinkedList<Clique> listeNmoinsUnCliques) {
+		this.listeNmoinsUnCliques = listeNmoinsUnCliques;
 	}
 	/**
 	 * @return the listeSortes
@@ -60,14 +88,14 @@ public class Graphe {
 	/**
 	 * @return the listeCliques
 	 */
-	public LinkedList<Clique> getListeCliques() {
-		return listeCliques;
+	public LinkedList<Clique> getListeNCliques() {
+		return listeNCliques;
 	}
 	/**
 	 * @param listeCliques the listeCliques to set
 	 */
-	public void setListeCliques(LinkedList<Clique> listeCliques) {
-		this.listeCliques = listeCliques;
+	public void setListeNCliques(LinkedList<Clique> listeCliques) {
+		this.listeNCliques = listeCliques;
 	}
 	/**
 	 * affiche l'arbre sous la forme suivante:<br/>
@@ -99,10 +127,20 @@ public class Graphe {
 	 * affiche la liste des cliques (1 clique par ligne)
 	 * @return
 	 */
-	public String afficherCliques()
+	public String afficherNCliques()
 	{
 		String res = "";
-		for(Clique c: listeCliques)
+		for(Clique c: listeNCliques)
+		{
+			res += c.toString() + "\n";
+		}
+		return res;
+	}
+	
+	public String afficherNmoinsUnCliques()
+	{
+		String res = "";
+		for(Clique c: listeNmoinsUnCliques)
 		{
 			res += c.toString() + "\n";
 		}
@@ -152,7 +190,7 @@ public class Graphe {
 			{
 				LinkedList<Processus> l = new LinkedList<Processus>();
 				l.add(p);
-				listeCliques.add(new Clique(l));
+				listeNCliques.add(new Clique(l));
 			}
 			
 		}
@@ -173,39 +211,91 @@ public class Graphe {
 	 */
 	public void ajouterSorte(Sorte s)
 	{
-		//nouvelle liste contenant les cliques augmentées d'un processus
-		LinkedList<Clique> listeTemp = new LinkedList<Clique>();
+		//nouvelles listes de cliques
+		LinkedList<Clique> listeTempN = new LinkedList<Clique>();
+		LinkedList<Clique> listeTempNMoinsUn = new LinkedList<Clique>();
 		for(Processus p1: s.getListeProcessus())
 		{
-			for(Clique c: listeCliques)
+			for(Clique c: listeNCliques)
 			{
-				boolean convient = true;
+				int nbRejets = 0;
 				/*
 				 * pour chaque processus de la clique, on regarde s'il a un lien
 				 * avec le processus en cours de traitement
 				 */
-				for(Processus p2: c.getListeProcessus())
+				/*
+				 * quand on recherchera les n-k cliques, remplacer pRejete par 
+				 * une liste de processus rejetés
+				 */
+				Processus pRejete = null;
+				Iterator<Processus> it = c.getListeProcessus().iterator();
+				while(it.hasNext() && nbRejets < 2)
 				{
-					convient &= p2.getListeAssociations().contains(p1);
+					Processus p2 = it.next();
+					if(!p2.getListeAssociations().contains(p1))
+					{
+						nbRejets++;
+						pRejete = p2;
+					}
 				}
 				/*
-				 * le processus testé convient s'il a un lien avec chacun des processus de la clique
-				 * Dans ce cas on l'insère, et on ajoute la clique ainsi générée dans listeTemp
+				 * Le processus testé a un lien avec tous ceux de la clique.
+				 * Donc on l'ajoute à la clique, que l'on ajoute à liste des n-cliques
 				 */
+				if(nbRejets == 0)
+				{
+					Clique cliqueAugmentee = new Clique(c);
+					cliqueAugmentee.addProcessus(p1);
+					listeTempN.add(cliqueAugmentee);
+				}
+				/*
+				 * Le processus testé a un lien avec tous ceux de la clique sauf un.
+				 * Donc on l'ajoute à la clique après avoir supprimé le processus bloquant,
+				 * puis on ajoute la clique à la liste des n-1-cliques
+				 */
+				else if(nbRejets == 1)
+				{
+					Clique cliqueAugmentee = new Clique(c);
+					cliqueAugmentee.remove(pRejete);
+					cliqueAugmentee.addProcessus(p1);
+					listeTempNMoinsUn.add(cliqueAugmentee);
+				}
+				/*
+				 * Le processus testé n'a pas assez de liens avec les éléments de la clique.
+				 * On garde donc la clique telle quelle, et on l'ajoute à la liste des
+				 * n-1-cliques
+				 */
+				else
+				{
+					if(!listeTempNMoinsUn.contains(c))
+						listeTempNMoinsUn.add(c);
+				}
+			}
+			
+			for(Clique c: listeNmoinsUnCliques)
+			{
+				boolean convient = true;
+				Iterator<Processus> it = c.getListeProcessus().iterator();
+				while(it.hasNext() && convient)
+				{
+					Processus p2 = it.next();
+					convient &= p2.getListeAssociations().contains(p1);
+				}
 				if(convient)
 				{
 					Clique cliqueAugmentee = new Clique(c);
 					cliqueAugmentee.addProcessus(p1);
-					listeTemp.add(cliqueAugmentee);
+					listeTempNMoinsUn.add(cliqueAugmentee);
 				}
 			}
 		}
-		//on remplace l'ancienne liste par la nouvelle
-		this.listeCliques = listeTemp;
+		//on remplace les anciennes listes par les nouvelles
+		this.listeNCliques = listeTempN;
+		this.listeNmoinsUnCliques = listeTempNMoinsUn;
 	}
 	
 	/**
-	 * charge le graphe contenu dans le fichier .ph pass� en param�tre
+	 * charge le graphe contenu dans le fichier .ph passé en param�tre
 
 	 * @param nomFichier
 	 */

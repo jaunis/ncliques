@@ -54,4 +54,11 @@ public class Clique
 	{
 		listeProcessus.add(p);
 	}
+	/**
+	 * @param pRejete
+	 */
+	public void remove(Processus pRejete) 
+	{
+		listeProcessus.remove(pRejete);
+	}
 }
