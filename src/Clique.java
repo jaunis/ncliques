@@ -1,3 +1,4 @@
+import java.security.InvalidParameterException;
 import java.util.LinkedList;
 
 /**
@@ -60,5 +61,13 @@ public class Clique
 	public void remove(Processus pRejete) 
 	{
 		listeProcessus.remove(pRejete);
+	}
+	
+	public boolean equals(Object c)
+	{
+		if(c instanceof Clique)
+			return listeProcessus.containsAll(((Clique)c).getListeProcessus());
+		else
+			throw new InvalidParameterException("Donner un objet de type Clique.");
 	}
 }

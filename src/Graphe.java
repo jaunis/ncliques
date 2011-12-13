@@ -31,23 +31,29 @@ public class Graphe {
 	{
 		Graphe g = new Graphe();
 		g.chargerGraphe("src/graphes/" + Graphe.fichierEntree);
+		
 		System.out.println("Graphe chargé. Calcul du HitlessGraph...");
 		g.getHitlessGraph();
+		
 		System.out.println("HitlessGraph calculé. Nettoyage...");
 		g.nettoyerGraphe();
+		
 		System.out.println("HitlessGraph nettoyé. Suppression des listes de frappes...");
 		g.supprimerHits();
-		//System.out.println(g);
+		
 		System.out.println("Frappes supprimées. Tri...");
 		Trieur.trierSortes("rand", g.getListeSortes());
 		Trieur.trierSortesOptimal("minMinNbRelations", "doubleMin", g.getListeSortes());
 		Trieur.reverseSortes(g.getListeSortes());
+		
 		System.out.println("Tri effectué. Recherche des n-cliques...");
 		Date datedeb = new Date();
 		g.rechercherCliques();
 		Date datefin = new Date();
 		long duree = datefin.getTime() - datedeb.getTime();
+		
 		System.out.println("cliques trouvées en: " + duree);
+		
 		boolean coherent = true;
 		int n = g.getListeSortes().size();
 		for(Clique c: g.getListeNmoinsUnCliques())
@@ -58,6 +64,7 @@ public class Graphe {
 			System.out.println("Toutes les tailles sont correctes.");
 		else
 			System.out.println("Tailles différentes!");
+		
 		System.out.println("Nombre de n-1-cliques: " + g.getListeNmoinsUnCliques().size());
 	}
 	
@@ -285,7 +292,8 @@ public class Graphe {
 				{
 					Clique cliqueAugmentee = new Clique(c);
 					cliqueAugmentee.addProcessus(p1);
-					listeTempNMoinsUn.add(cliqueAugmentee);
+					if(!listeTempNMoinsUn.contains(cliqueAugmentee))
+						listeTempNMoinsUn.add(cliqueAugmentee);
 				}
 			}
 		}
