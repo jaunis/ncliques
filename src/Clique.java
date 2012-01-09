@@ -66,7 +66,8 @@ public class Clique
 	public boolean equals(Object c)
 	{
 		if(c instanceof Clique)
-			return listeProcessus.containsAll(((Clique)c).getListeProcessus());
+			return (listeProcessus.containsAll(((Clique)c).getListeProcessus())
+					&& listeProcessus.size() == ((Clique) c).getListeProcessus().size());
 		else
 			throw new InvalidParameterException("Donner un objet de type Clique.");
 	}

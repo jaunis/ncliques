@@ -46,7 +46,7 @@ public class Graphe {
 		Trieur.trierSortesOptimal("minMinNbRelations", "doubleMin", g.getListeSortes());
 		Trieur.reverseSortes(g.getListeSortes());
 		
-		System.out.println("Tri effectué. Recherche des n-cliques...");
+		System.out.println("Tri effectué. Recherche des n-1-cliques...");
 		Date datedeb = new Date();
 		g.rechercherCliques();
 		Date datefin = new Date();
@@ -174,7 +174,7 @@ public class Graphe {
 	
 	/**
 	 * Calcule la liste des cliques<br/>
-	 * <b>Pr�requis:</b> le HitlessGraph a d�j� �t� nettoy�
+	 * <b>Prérequis:</b> le HitlessGraph a déjà été nettoyé
 	 */
 	public void rechercherCliques()
 	{
@@ -272,11 +272,12 @@ public class Graphe {
 				 * On garde donc la clique telle quelle, et on l'ajoute à la liste des
 				 * n-1-cliques
 				 */
-				else
-				{
+				//TODO correction possible: ajouter c à listeTempNMoinsUn dans tous les cas
+				/*else
+				{*/
 					if(!listeTempNMoinsUn.contains(c))
 						listeTempNMoinsUn.add(c);
-				}
+				//}
 			}
 			
 			for(Clique c: listeNmoinsUnCliques)
@@ -305,7 +306,7 @@ public class Graphe {
 	/**
 	 * charge le graphe contenu dans le fichier .ph passé en param�tre
 
-	 * @param nomFichier
+	 * @param nomFichier le nom du fichier à charger
 	 */
 	public void chargerGraphe(String nomFichier)
 	{
