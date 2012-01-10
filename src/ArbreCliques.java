@@ -341,10 +341,10 @@ public class ArbreCliques
 	 * @param a
 	 * @throws InvalidParameterException
 	 */
-	public void fusionner(ArbreCliques a) throws InvalidParameterException
+	/*public void fusionner(ArbreCliques a) throws InvalidParameterException
 	{
 		if(a.getValeur()!=null) 
-			throw new InvalidParameterException("Il faut passer un arbre complet en param�tre (racine nulle)");
+			throw new InvalidParameterException("Il faut passer un arbre complet en paramètre (racine nulle)");
 		
 		ArbreCliques copie = new ArbreCliques(a);
 		boolean valide = true;
@@ -360,7 +360,7 @@ public class ArbreCliques
 				}
 			}
 		}
-	}
+	}*/
 	
 	/**
 	 * teste si le processus pass� en param�tre peut �tre ins�r� dans l'arbre courant

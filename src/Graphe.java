@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
+@SuppressWarnings("unused")
 public class Graphe {
 
 	protected LinkedList<Sorte> listeSortes = new LinkedList<Sorte>();
@@ -28,17 +29,16 @@ public class Graphe {
 	public static void main(String[] args) 
 	{
 		Graphe g = new Graphe();
-		//g.chargerGraphe("src/graphes/egfr20_flat.ph");
-		g.chargerGraphe("src/graphes/graphe");
+		g.chargerGraphe("src/graphes/egfr20_flat.ph");
 		System.out.println("Graphe chargé. Calcul du HitlessGraph...");
-		//g.getHitlessGraph();
+		g.getHitlessGraph();
 		System.out.println("HitlessGraph calculé. Nettoyage...");
 		g.nettoyerGraphe();
 		System.out.println("HitlessGraph nettoyé. Suppression des listes de frappes...");
-		//g.supprimerHits();
+		g.supprimerHits();
 		System.out.println("Frappes supprimées. Recherche des n-cliques...");
-		//.trierSortes("rand");
-		//g.trierSortesOptimal("minMinNbRelations", "moyenne");
+		g.trierSortes("rand");
+		g.trierSortesOptimal("minMinNbRelations", "moyenne");
 		Date datedeb = new Date();
 		g.rechercherCliques();
 		Date datefin = new Date();
@@ -125,7 +125,7 @@ public class Graphe {
 	}
 	/**
 	 * Calcule la liste des cliques<br/>
-	 * <b>Pr�requis:</b> le HitlessGraph a d�j� �t� nettoy�
+	 * <b>Prérequis:</b> le HitlessGraph a d�j� �t� nettoy�
 	 */
 	public void rechercherCliques()
 	{
@@ -169,7 +169,7 @@ public class Graphe {
 	 */
 	public void chargerGraphe(String nomFichier)
 	{
-		try
+		/*try
 		{
 			InputStream ips=new FileInputStream(nomFichier); 
 			InputStreamReader ipsr=new InputStreamReader(ips);
@@ -197,8 +197,8 @@ public class Graphe {
 		catch(Exception e)
 		{
 			e.printStackTrace();
-		}
-		/*
+		}*/
+		
 		try
 		{
 			InputStream ips=new FileInputStream(nomFichier); 
@@ -238,11 +238,9 @@ public class Graphe {
 		{
 			e.printStackTrace();
 		}
-		*/
-		
 	}
 	/**
-	 * r�cup�re une Sorte � l'aide de son nom
+	 * récupère une Sorte à l'aide de son nom
 	 * @param nom
 	 * @return
 	 */
