@@ -27,7 +27,7 @@ public class Graphe {
 	public static void main(String[] args) 
 	{
 		Graphe g = new Graphe();
-		g.chargerGraphe("src/graphes/egfr20_tcrsig40_flat.ph");
+		g.chargerGraphe("src/graphes/egfr20_flat.ph");
 		
 		System.out.println("Graphe chargé. Calcul du HitlessGraph...");
 		g.getHitlessGraph();
