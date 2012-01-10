@@ -66,6 +66,10 @@ public class Graphe {
 			System.out.println("Tailles différentes!");
 		
 		System.out.println("Nombre de n-1-cliques: " + g.getListeNmoinsUnCliques().size());
+		System.out.println("Nombre de n-cliques:" + g.getListeNCliques().size());
+		
+		if(g.existeDoublons()) System.out.println("Il y a des doublons.");
+		else System.out.println("Pas de doublons.");
 	}
 	
 	/**
@@ -273,11 +277,11 @@ public class Graphe {
 				 * n-1-cliques
 				 */
 				//TODO correction possible: ajouter c à listeTempNMoinsUn dans tous les cas
-				/*else
-				{*/
+				else
+				{
 					if(!listeTempNMoinsUn.contains(c))
 						listeTempNMoinsUn.add(c);
-				//}
+				}
 			}
 			
 			for(Clique c: listeNmoinsUnCliques)
@@ -472,5 +476,21 @@ public class Graphe {
 				p.setListeHits(null);
 			}
 		}
+	}
+	
+	/**
+	 * teste la présence de doublons dans la liste de cliques<br/>
+	 * !!détruit listeNMoinsUnCliques
+	 * @return
+	 */
+	public boolean existeDoublons()
+	{
+		boolean res = false;
+		for(int i = 0; i<this.listeNmoinsUnCliques.size(); i++)
+		{
+			Clique c = this.listeNmoinsUnCliques.removeFirst();
+			res |= this.listeNmoinsUnCliques.contains(c);
+		}
+		return res;
 	}
 }
