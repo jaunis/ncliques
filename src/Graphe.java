@@ -2,6 +2,8 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -143,6 +145,8 @@ public class Graphe {
 	{
 		if(!liste.isEmpty())
 		{
+			MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
+			System.out.println(memoryBean.getHeapMemoryUsage());
 			Sorte first = liste.removeFirst();
 			ajouterSorte(first);
 			//System.out.println(liste.size());
