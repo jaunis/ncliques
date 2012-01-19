@@ -1,4 +1,4 @@
-import java.security.InvalidParameterException;
+import java.util.Hashtable;
 import java.util.LinkedList;
 
 
@@ -8,32 +8,59 @@ public class ArbreCliques
 	protected Processus valeur = null;
 	//liste des fils
 	protected LinkedList<ArbreCliques> listeFils = new LinkedList<>();
+	// liste des pères
+	protected LinkedList<ArbreCliques> listePeres = new LinkedList<>();
 	//hauteur: mis à jour uniquement pour la racine de l'arbre
 	protected int hauteur = 0;
-	protected LinkedList<ArbreCliques> listePeres = new LinkedList<>();
-	protected ArbreCliques accepte;
-	protected boolean nettoye1;
-	protected boolean nettoye2;
+	//noeuds de l'arbre avec lesquels le noeud courant n'a pas de lien
+	protected LinkedList<ArbreCliques> listeBloquants = new LinkedList<>();
 	
 	public ArbreCliques(Processus p) {
 		this.valeur = p;
 	}
 	
 	public ArbreCliques()
+	{}
+	
+	public ArbreCliques dupliquer()
 	{
-		
+		ArbreCliques n = new ArbreCliques(valeur);
+		Hashtable<ArbreCliques, ArbreCliques> table = new Hashtable<>();
+		table.put(this, n);
+		if(!estFeuille()) dupliquer(listeFils, table);
+		n.setListePeres(new LinkedList<ArbreCliques>(listePeres));
+		return n;
 	}
-	public ArbreCliques(ArbreCliques a) {
-		hauteur = a.getHauteur();
-		valeur = a.getValeur();
-		if(!a.estFeuille())
+	
+	private void dupliquer(LinkedList<ArbreCliques> niveauActuel,
+							Hashtable<ArbreCliques, ArbreCliques> table)
+	{
+		LinkedList<ArbreCliques> niveauSuivant = new LinkedList<>();
+		for(ArbreCliques a: niveauActuel)
 		{
-			for(ArbreCliques f: a.getListeFils())
+			ArbreCliques f = new ArbreCliques(a.getValeur());
+			table.put(a, f);
+			for(ArbreCliques p: a.getListePeres())
 			{
-				listeFils.add(new ArbreCliques(f));
+				ArbreCliques p2 = table.get(p);
+				if(p2 == null)
+				{
+					f.getListePeres().add(p);
+					p.getListeFils().add(f);
+				}
+				else
+				{
+					f.getListePeres().add(p2);
+					p2.getListeFils().add(f);
+				}
+			}
+			for(ArbreCliques fils: a.getListeFils())
+			{
+				if(!niveauSuivant.contains(fils)) niveauSuivant.add(f);
 			}
 		}
-		listePeres = a.getListePeres();
+		
+		if(!niveauSuivant.isEmpty()) dupliquer(niveauSuivant, table);
 	}
 
 	/**
@@ -48,48 +75,6 @@ public class ArbreCliques
 	 */
 	public void setListePeres(LinkedList<ArbreCliques> listePeres) {
 		this.listePeres = listePeres;
-	}
-
-	/**
-	 * @return the valide
-	 */
-	public ArbreCliques getAccepte() {
-		return accepte;
-	}
-
-	/**
-	 * @param valide the valide to set
-	 */
-	public void setAccepte(ArbreCliques accepte) {
-		this.accepte = accepte;
-	}
-
-	/**
-	 * @return the nettoye1
-	 */
-	public boolean isNettoye1() {
-		return nettoye1;
-	}
-
-	/**
-	 * @param nettoye1 the nettoye1 to set
-	 */
-	public void setNettoye1(boolean nettoye1) {
-		this.nettoye1 = nettoye1;
-	}
-
-	/**
-	 * @return the nettoye2
-	 */
-	public boolean isNettoye2() {
-		return nettoye2;
-	}
-
-	/**
-	 * @param nettoye2 the nettoye2 to set
-	 */
-	public void setNettoye2(boolean nettoye2) {
-		this.nettoye2 = nettoye2;
 	}
 
 	/**
@@ -130,29 +115,53 @@ public class ArbreCliques
 	}
 	
 	/**
-	 * fonction r�cursive appel�e par toString()
+	 * @return the listeBloquants
+	 */
+	public LinkedList<ArbreCliques> getListeBloquants() {
+		return listeBloquants;
+	}
+
+	/**
+	 * @param listeBloquants the listeBloquants to set
+	 */
+	public void setListeBloquants(LinkedList<ArbreCliques> listeBloquants) {
+		this.listeBloquants = listeBloquants;
+	}	
+	
+	/**
+	 * fonction récursive appelée par toString();
+	 * on n'affiche pas tout l'arbre, uniquement les cliques "valides"
 	 * @param chaine
 	 * @return
 	 */
-	protected String toString(String chaine)
+	protected String toString(String chaine, LinkedList<ArbreCliques> listeInterdits)
 	{
-		if(estFeuille())
+		if(listeInterdits.contains(this))
 		{
-			String res = chaine + ", " + valeur + "\n";
-			return res.substring(2);
+			return "";
 		}
 		else
 		{
-			String local;
-			if(valeur == null) local = chaine;
-			else local = chaine + ", " + valeur;
-			String res = "";
-			for(ArbreCliques a: listeFils)
+			if(estFeuille())
 			{
-				res += a.toString(local);
+				String res = chaine + ", " + valeur + "\n";
+				return res.substring(2);
 			}
-			return res;
+			else
+			{
+				String local;
+				if(valeur == null) local = chaine;
+				else local = chaine + ", " + valeur;
+				String res = "";
+				listeInterdits.addAll(listeBloquants);
+				for(ArbreCliques a: listeFils)
+				{
+					res += a.toString(local, new LinkedList<>(listeInterdits));
+				}
+				return res;
+			}
 		}
+		
 	}
 	
 	/**
@@ -160,11 +169,11 @@ public class ArbreCliques
 	 */
 	public String toString()
 	{
-		return toString("");
+		return toString("", new LinkedList<ArbreCliques>());
 	}
 	
 	/**
-	 * teste si l'�l�ment est une feuille
+	 * teste si l'élément est une feuille
 	 * @return
 	 */
 	public boolean estFeuille()
@@ -194,8 +203,25 @@ public class ArbreCliques
 		}
 	}
 	
+	public int getProfondeurMin()
+	{
+		if(valeur==null && estFeuille()) return 0;
+		else if(estFeuille()) return 1;
+		else
+		{
+			int ajout = valeur == null? 0 : 1;
+			int min = 10000;
+			int local;
+			for(ArbreCliques a: listeFils)
+			{
+				local = a.getProfondeurMin();
+				if(local<min) min = local;
+			}
+			return min + ajout;
+		}
+	}
 	/**
-	 * appelle addProcessus(Processus, int) pour ins�rer le processus au bon endroit dans l'arbre
+	 * appelle addProcessus(Processus, int) pour insérer le processus au bon endroit dans l'arbre
 	 * @param p
 	 */
 	public void addProcessus(Processus p)
@@ -205,10 +231,9 @@ public class ArbreCliques
 		{
 			for(ArbreCliques a: listeFils)
 			{
-				a.addProcessus(nouveau, hauteur - 1);
+				a.addProcessus(nouveau, hauteur - 1, new LinkedList<ArbreCliques>());
 			}
-			nettoyer1(nouveau);
-			reset1();
+			
 		}
 		else listeFils.add(nouveau);
 	}
@@ -219,214 +244,56 @@ public class ArbreCliques
 	 * @param p
 	 * @param profondeur
 	 */
-	protected void addProcessus(ArbreCliques nouveau, int profondeur)
+	protected void addProcessus(ArbreCliques nouveau, 
+								int profondeur,
+								LinkedList<ArbreCliques> listeInterdits
+								)
 	{
-		/*
-		 * si l'arbre est déjà "marqué" par nouveau (accepte == nouveau)
-		 * alors tout ce qui suit a déjà été validé donc on s'arrête
-		 * 
-		 * sinon, si le processus est accepté, on marque l'arbre
-		 * et on valide récursivement
-		 */
-		if((accepte != nouveau) && valeur.accepte(nouveau.getValeur()))
+		if(valeur.accepte(nouveau.getValeur()))
 		{
 			
-			accepte = nouveau;
-			if(profondeur == 0)
+			if(!listeInterdits.contains(this))
 			{
-				listeFils.add(nouveau);
-				nouveau.getListePeres().add(this);
-			}
-			else
-			{
-				for(ArbreCliques a: listeFils)
+				if(profondeur == 0)
 				{
-					a.addProcessus(nouveau, profondeur - 1);
+					if(!listeFils.contains(nouveau)) 
+						listeFils.add(nouveau);
+					if(!nouveau.getListePeres().contains(this)) 
+						nouveau.getListePeres().add(this);
+				}
+				else
+				{
+					listeInterdits.addAll(listeBloquants);
+					for(ArbreCliques a: listeFils)
+					{
+						a.addProcessus(nouveau, profondeur - 1, new LinkedList<>(listeInterdits));
+					}
 				}
 			}
 			
+			
 		}
-		
-	}
-	
-	protected void nettoyer1(ArbreCliques nouveau)
-	{
-		if((!nettoye1 && this != nouveau && accepte == nouveau) || valeur == null)
+		else
 		{
-			if(listePeres.size() > 1)
-			{
-				LinkedList<ArbreCliques> listePeresValidant = new LinkedList<>();
-				LinkedList<ArbreCliques> listePeresInvalidant = new LinkedList<>();
-				for(ArbreCliques p: listePeres)
-				{
-					if(p.getAccepte() == nouveau) listePeresValidant.add(p);
-					else listePeresInvalidant.add(p);
-				}
-				listePeres = listePeresValidant;
-				ArbreCliques dupliquat = new ArbreCliques(this);
-				dupliquat.setListePeres(listePeresInvalidant);
-				for(ArbreCliques p: listePeresInvalidant)
-				{
-					p.getListeFils().remove(this);
-					p.getListeFils().add(dupliquat);
-				}
-				dupliquat.supprimer(nouveau);
-			}
-			nettoye1 = true;
-			if(!estFeuille())
-			{
-				for(ArbreCliques f: listeFils)
-				{
-					f.nettoyer1(nouveau);
-				}
-			}
-		}
-		
-	}
-	
-	private void supprimer(ArbreCliques nouveau) 
-	{
-		if(!estFeuille())
-		{
-			listeFils.remove(nouveau);
-			if(!estFeuille())
-			{
-				for(ArbreCliques f: listeFils)
-				{
-					f.supprimer(nouveau);
-				}
-			}
+			listeBloquants.add(nouveau);
 		}
 	}
 
 	/**
-	 * supprime les branches de profondeur inférieure à la valeur passée en paramètre
-	 * @param profondeur
+	 * @param hauteur2
 	 */
-	protected void nettoyer2(int profondeur)
+	public void nettoyer(int hauteur2) 
 	{
-		if(!estFeuille() && !nettoye2)
+		if(!estFeuille())
 		{
-			ArbreCliques[] listeSuppression = new ArbreCliques[listeFils.size()];
-			int i=0;
+			LinkedList<ArbreCliques> listeSuppression = new LinkedList<>();
 			for(ArbreCliques a: listeFils)
 			{
-				if(a.getProfondeurMax()<profondeur)
-				{
-					listeSuppression[i] = a;
-					i++;
-				}
-				else a.nettoyer2(profondeur - 1);
+				if(a.getProfondeurMax() < hauteur2 - 1) listeSuppression.add(a);
 			}
-			int j=0;
-			for(j=0; j<i; j++)
+			for(ArbreCliques a: listeSuppression)
 			{
-				listeFils.remove(listeSuppression[j]);
-			}
-			nettoye2 = true;
-		}
-		
-	}
-	
-	/**
-	 * appelle nettoyer(int)
-	 */
-	public void nettoyer2()
-	{
-		nettoyer2(hauteur);
-	}
-	
-	/**
-	 * fusionner deux arbres, en supprimant les processus qui ne conviennent pas
-	 * @param a
-	 * @throws InvalidParameterException
-	 */
-	/*public void fusionner(ArbreCliques a) throws InvalidParameterException
-	{
-		if(a.getValeur()!=null) 
-			throw new InvalidParameterException("Il faut passer un arbre complet en paramètre (racine nulle)");
-		
-		ArbreCliques copie = new ArbreCliques(a);
-		boolean valide = true;
-		if(valeur != null) valide = copie.accepte(valeur);
-		if(valide)
-		{
-			if(estFeuille()) listeFils = copie.getListeFils();
-			else
-			{
-				for(ArbreCliques f: listeFils)
-				{
-					f.fusionner(copie);
-				}
-			}
-		}
-	}*/
-	
-	/**
-	 * teste si le processus pass� en param�tre peut �tre ins�r� dans l'arbre courant
-	 * @param valeur2
-	 * @return
-	 * @throws InvalidParameterException
-	 */
-	protected boolean accepte(Processus valeur2) throws InvalidParameterException
-	{
-		if(valeur2 == null)
-			throw new InvalidParameterException("Impossible de passer une valeur nulle en param�tre.");
-		if(valeur == null && estFeuille()) return true;
-		else if(estFeuille()) return (valeur.getListeAssociations().contains(valeur2));
-		else
-		{
-			boolean b1 = true;
-			if(valeur != null) b1 = valeur.getListeAssociations().contains(valeur2);
-			if(!b1) return false;
-			else
-			{
-				boolean res = false;
-				LinkedList<ArbreCliques> listeSuppression = new LinkedList<ArbreCliques>();
-				for(ArbreCliques a: listeFils)
-				{
-					if(a.accepte(valeur2)) res = true;
-					else
-					{
-						listeSuppression.add(a);
-						res |= false;
-					}
-				}
-				for(ArbreCliques a: listeSuppression)
-				{
-					listeFils.remove(a);
-				}
-				return res;
-			}
-			
-		}
-	}
-	
-	/**
-	 * met à false toutes les occurences de nettoye1 dans l'arbre
-	 */
-	public void reset1()
-	{
-		if(nettoye1 || valeur == null)
-		{
-			nettoye1 = false;
-			for(ArbreCliques f: listeFils)
-			{
-				f.reset1();
-			}
-		}
-	}
-	/**
-	 * met à false toutes les occurences de nettoye2 dans l'arbre
-	 */
-	public void reset2()
-	{
-		if(nettoye2 || valeur == null)
-		{
-			nettoye2 = false;
-			for(ArbreCliques f: listeFils)
-			{
-				f.reset2();
+				listeFils.remove(a);
 			}
 		}
 	}

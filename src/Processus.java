@@ -155,8 +155,8 @@ public class Processus
 	}
 	
 	/**
-	 * teste si le processus en cours est lié avec le processus passé en paramètre.<br/>
-	 * (optimisé, de façon à ne pas faire un contains(p) à chaque fois.
+	 * teste si le processus en cours est liÃ© avec le processus passÃ© en paramÃ¨tre.<br/>
+	 * (optimisÃ©, de faÃ§on Ã  ne pas faire un contains(p) Ã  chaque fois.
 	 * @param p
 	 * @return
 	 */

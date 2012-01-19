@@ -30,7 +30,7 @@ public class Graphe {
 	{
 		Graphe g = new Graphe();
 		g.chargerGraphe("src/graphes/egfr20_flat.ph");
-		
+		//g.chargerGraphe("src/graphes/graphe");
 		System.out.println("Graphe chargé. Calcul du HitlessGraph...");
 		g.getHitlessGraph();
 		
@@ -51,6 +51,8 @@ public class Graphe {
 		
 		long duree = datefin.getTime() - datedeb.getTime();
 		System.out.println("cliques trouvées en: " + duree);
+		System.out.println("Profondeur min: " + g.getArbre().getProfondeurMin());
+		System.out.println("Profondeur max: " + g.getArbre().getProfondeurMax());
 		System.out.println(g.afficherCliques());
 	}
 	/**
@@ -136,6 +138,8 @@ public class Graphe {
 	 */
 	public void rechercherCliques()
 	{
+//		System.err.println("Recherche inopérante pour le moment.");
+//		System.exit(1);
 		rechercherCliques(new LinkedList<Sorte>(this.listeSortes));
 	}
 	
@@ -149,8 +153,8 @@ public class Graphe {
 		{
 			Sorte first = liste.removeFirst();
 			ajouterSorte(first);
-			System.out.println("taille de la liste: " + liste.size());
-			System.out.println("profondeur de l'arbre: " + arbre.getProfondeurMax());
+//			System.out.println("taille de la liste: " + liste.size());
+//			System.out.println("profondeur de l'arbre: " + arbre.getProfondeurMax());
 			rechercherCliques(liste);	
 		}
 		
@@ -166,8 +170,7 @@ public class Graphe {
 			arbre.addProcessus(p);
 		}
 		arbre.setHauteur(arbre.getHauteur() + 1);
-		arbre.nettoyer2();
-		arbre.reset2();
+		arbre.nettoyer(arbre.getHauteur());
 	}
 	
 	/**
@@ -284,7 +287,7 @@ public class Graphe {
 			{
 				Iterator<Sorte> it = listeSortes.iterator();
 				/*
-				 * positionnement de l'it�rateur � l'indice i+1
+				 * positionnement de l'itérateur à l'indice i+1
 				 */
 				for(int j=0;j<i+1;j++)
 				{
@@ -326,7 +329,7 @@ public class Graphe {
 	}
 	
 	/**
-	 * appelle la fonction de recherche en diviser pour r�gner
+	 * appelle la fonction de recherche en diviser pour régner
 	 */
 	/*public void rechercherCliquesDPR()
 	{
@@ -334,7 +337,7 @@ public class Graphe {
 	}*/
 	
 	/**
-	 * algo. de recherche des cliques, de type diviser pour r�gner
+	 * algo. de recherche des cliques, de type diviser pour régner
 	 * @param liste
 	 * @return
 	 */
