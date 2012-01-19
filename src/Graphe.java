@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.management.ManagementFactory;
 import java.security.InvalidParameterException;
 import java.util.Collections;
 import java.util.Comparator;
@@ -156,7 +157,7 @@ public class Graphe {
 	 */
 	protected void rechercherCliques(LinkedList<Sorte> liste)
 	{
-		utilMemoire.add(Runtime.getRuntime().freeMemory());
+		utilMemoire.add(ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed());
 		if(!liste.isEmpty())
 		{
 			Sorte first = liste.removeFirst();
