@@ -3,7 +3,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -21,7 +20,14 @@ public class Graphe {
 	 * (nombre de cliques = nombre de feuilles)
 	 */
 	protected ArbreCliques arbre = new ArbreCliques();
+	protected LinkedList<Long> utilMemoire = new LinkedList<>();
 		
+	/**
+	 * @return the utilMemoire
+	 */
+	public LinkedList<Long> getUtilMemoire() {
+		return utilMemoire;
+	}
 	/**
 	 * bons résultats avec moyenne
 	 * @param args
@@ -41,7 +47,7 @@ public class Graphe {
 		g.supprimerHits();
 		
 		System.out.println("Frappes supprimées. Tri...");
-		Trieur.trierSortes("rand", g.getListeSortes());
+		//Trieur.trierSortes("rand", g.getListeSortes());
 		Trieur.trierSortesOptimal("minSommeRelations", "moyenne", g.getListeSortes());
 		System.out.println("Tri effectué. Recherche des n-cliques...");
 		Date datedeb = new Date();
@@ -49,6 +55,8 @@ public class Graphe {
 		Date datefin = new Date();
 		long duree = datefin.getTime() - datedeb.getTime();
 		System.out.println("cliques trouvées en: " + duree);
+		long max = Collections.max(g.getUtilMemoire());
+		System.out.println("Mémoire utilisée: " + max);
 		System.out.println(g.afficherCliques());
 	}
 	/**
@@ -145,8 +153,8 @@ public class Graphe {
 	{
 		if(!liste.isEmpty())
 		{
-			MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
-			System.out.println(memoryBean.getHeapMemoryUsage());
+			
+			utilMemoire.add(ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed());
 			Sorte first = liste.removeFirst();
 			ajouterSorte(first);
 			//System.out.println(liste.size());
