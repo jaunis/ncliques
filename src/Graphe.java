@@ -21,7 +21,14 @@ public class Graphe {
 	 * (nombre de cliques = nombre de feuilles)
 	 */
 	protected ArbreCliques arbre = new ArbreCliques();
+	protected LinkedList<Long> utilMemoire = new LinkedList<>();
 		
+	/**
+	 * @return the utilMemoire
+	 */
+	public LinkedList<Long> getUtilMemoire() {
+		return utilMemoire;
+	}
 	/**
 	 * bons résultats avec moyenne
 	 * @param args
@@ -45,14 +52,14 @@ public class Graphe {
 		//Trieur.trierSortes("rand", g.getListeSortes());
 		Trieur.trierSortesOptimal("minMinNbRelations", "moyenne", g.getListeSortes());
 		
-		Date datedeb = new Date();
+		long datedeb = System.currentTimeMillis();
 		g.rechercherCliques();
-		Date datefin = new Date();
+		long datefin = System.currentTimeMillis();
 		
-		long duree = datefin.getTime() - datedeb.getTime();
+		long duree = datefin - datedeb;
 		System.out.println("cliques trouvées en: " + duree);
-		System.out.println("Profondeur min: " + g.getArbre().getProfondeurMin());
-		System.out.println("Profondeur max: " + g.getArbre().getProfondeurMax());
+		long max = Collections.max(g.getUtilMemoire());
+		System.out.println("Mémoire max. utilisée: " + max);
 		System.out.println(g.afficherCliques());
 	}
 	/**
@@ -149,6 +156,7 @@ public class Graphe {
 	 */
 	protected void rechercherCliques(LinkedList<Sorte> liste)
 	{
+		utilMemoire.add(Runtime.getRuntime().freeMemory());
 		if(!liste.isEmpty())
 		{
 			Sorte first = liste.removeFirst();
@@ -170,7 +178,7 @@ public class Graphe {
 			arbre.addProcessus(p);
 		}
 		arbre.setHauteur(arbre.getHauteur() + 1);
-		arbre.nettoyer(arbre.getHauteur());
+		arbre.nettoyer();
 	}
 	
 	/**

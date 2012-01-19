@@ -1,4 +1,3 @@
-import java.util.Hashtable;
 import java.util.LinkedList;
 
 
@@ -9,7 +8,7 @@ public class ArbreCliques
 	//liste des fils
 	protected LinkedList<ArbreCliques> listeFils = new LinkedList<>();
 	// liste des pères
-	protected LinkedList<ArbreCliques> listePeres = new LinkedList<>();
+	//protected LinkedList<ArbreCliques> listePeres = new LinkedList<>();
 	//hauteur: mis à jour uniquement pour la racine de l'arbre
 	protected int hauteur = 0;
 	//noeuds de l'arbre avec lesquels le noeud courant n'a pas de lien
@@ -22,7 +21,7 @@ public class ArbreCliques
 	public ArbreCliques()
 	{}
 	
-	public ArbreCliques dupliquer()
+	/*public ArbreCliques dupliquer()
 	{
 		ArbreCliques n = new ArbreCliques(valeur);
 		Hashtable<ArbreCliques, ArbreCliques> table = new Hashtable<>();
@@ -61,21 +60,21 @@ public class ArbreCliques
 		}
 		
 		if(!niveauSuivant.isEmpty()) dupliquer(niveauSuivant, table);
-	}
+	}*/
 
 	/**
 	 * @return the listePeres
 	 */
-	public LinkedList<ArbreCliques> getListePeres() {
-		return listePeres;
-	}
+//	public LinkedList<ArbreCliques> getListePeres() {
+//		return listePeres;
+//	}
 
 	/**
 	 * @param listePeres the listePeres to set
 	 */
-	public void setListePeres(LinkedList<ArbreCliques> listePeres) {
-		this.listePeres = listePeres;
-	}
+//	public void setListePeres(LinkedList<ArbreCliques> listePeres) {
+//		this.listePeres = listePeres;
+//	}
 
 	/**
 	 * @return the hauteur
@@ -258,8 +257,8 @@ public class ArbreCliques
 				{
 					if(!listeFils.contains(nouveau)) 
 						listeFils.add(nouveau);
-					if(!nouveau.getListePeres().contains(this)) 
-						nouveau.getListePeres().add(this);
+//					if(!nouveau.getListePeres().contains(this)) 
+//						nouveau.getListePeres().add(this);
 				}
 				else
 				{
@@ -280,21 +279,38 @@ public class ArbreCliques
 	}
 
 	/**
-	 * @param hauteur2
+	 * supprime les branches de profondeur inf�rieure � la valeur pass�e en param�tre
+	 * @param profondeur
 	 */
-	public void nettoyer(int hauteur2) 
+	protected void nettoyer(int profondeur)
 	{
 		if(!estFeuille())
 		{
-			LinkedList<ArbreCliques> listeSuppression = new LinkedList<>();
+			ArbreCliques[] listeSuppression = new ArbreCliques[listeFils.size()];
+			int i=0;
 			for(ArbreCliques a: listeFils)
 			{
-				if(a.getProfondeurMax() < hauteur2 - 1) listeSuppression.add(a);
+				if(a.getProfondeurMax()<profondeur)
+				{
+					listeSuppression[i] = a;
+					i++;
+				}
+				else a.nettoyer(profondeur - 1);
 			}
-			for(ArbreCliques a: listeSuppression)
+			int j=0;
+			for(j=0; j<i; j++)
 			{
-				listeFils.remove(a);
+				listeFils.remove(listeSuppression[j]);
 			}
 		}
+		
+	}
+	
+	/**
+	 * appelle nettoyer(int)
+	 */
+	public void nettoyer()
+	{
+		nettoyer(hauteur);
 	}
 }
