@@ -61,6 +61,9 @@ public class Graphe {
 		System.out.println("cliques trouvées en: " + duree);
 		long max = Collections.max(g.getUtilMemoire());
 		System.out.println("Mémoire max. utilisée: " + max);
+		System.out.println("Profondeur max: " + g.getArbre().getProfondeurMax());
+		System.out.println("Profondeur min: " + g.getArbre().getProfondeurMin());
+		System.out.println("Profondeur théorique: " + g.getArbre().getHauteur());
 		System.out.println(g.afficherCliques());
 	}
 	/**
@@ -174,6 +177,7 @@ public class Graphe {
 	 */
 	public void ajouterSorte(Sorte s)
 	{
+		System.out.println(s.getListeProcessus().size());
 		for(Processus p: s.getListeProcessus())
 		{
 			arbre.addProcessus(p);

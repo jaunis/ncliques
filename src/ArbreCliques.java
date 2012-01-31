@@ -87,7 +87,7 @@ public class ArbreCliques
 	protected void dupliquer(LinkedList<ArbreCliques> niveauActuel,
 							Hashtable<ArbreCliques, ArbreCliques> table)
 	{
-		System.out.println("entrée dans la récursive");
+		System.out.println("entrée dans la récursive, taille du niveau: " + niveauActuel.size());
 		LinkedList<ArbreCliques> niveauSuivant = new LinkedList<>();
 		for(ArbreCliques a: niveauActuel)
 		{
@@ -375,8 +375,13 @@ public class ArbreCliques
 				if(!listeFils.contains(nouveau))
 				{
 					listeFils.add(nouveau);
+					System.out.println("nouveau ajouté");
 					if(!nouveau.listePeres.contains(this))
+					{
 						nouveau.listePeres.add(this);
+						System.out.println("père ajouté");
+					}
+						
 					for(ArbreCliques pere: listePeres)
 					{
 						//System.out.println("addProcessus:" + this.hashCode() + ", "+ pere.hashCode());
@@ -409,14 +414,11 @@ public class ArbreCliques
 				{
 					ArbreCliques[] copiePeres = new ArbreCliques[listePeres.size()];
 					copiePeres = listePeres.toArray(copiePeres);
-					
-//					for(ArbreCliques pere: listePeres)
-//					{
-//						//System.out.println("remonter:" + this.hashCode() + ", " + pere.hashCode());
-//						pere.remonter(nouveau, this);
-//					}
+
+					//la copie évite les pbl de modification concurrente
 					for(ArbreCliques pere: copiePeres)
 					{
+						//System.out.println("remonter:" + this.hashCode() + ", " + pere.hashCode());
 						pere.remonter(nouveau, this);
 					}
 				}
@@ -480,6 +482,10 @@ public class ArbreCliques
 			for(ArbreCliques a: listeSuppression)
 			{
 				listeFils.remove(a);
+			}
+			for(ArbreCliques a: listeFils)
+			{
+				a.remove(nouveau);
 			}
 		}
 	}
