@@ -1,3 +1,4 @@
+import java.util.ConcurrentModificationException;
 import java.util.Hashtable;
 import java.util.LinkedList;
 
@@ -80,12 +81,13 @@ public class ArbreCliques
 	 * méthode récursive fonctionnant par effet de bord</br>
 	 * L'arbre est parcouru en largeur d'abord. Le niveau de noeuds courant est contenu dans
 	 * niveauActuel.
-	 * @param niveauActuel: liste d'arbres à dupliquer
-	 * @param table: table de hachage associant les anciens noeuds aux nouveaux
+	 * @param niveauActuel liste d'arbres à dupliquer
+	 * @param table table de hachage associant les anciens noeuds aux nouveaux
 	 */
 	protected void dupliquer(LinkedList<ArbreCliques> niveauActuel,
 							Hashtable<ArbreCliques, ArbreCliques> table)
 	{
+		System.out.println("entrée dans la récursive");
 		LinkedList<ArbreCliques> niveauSuivant = new LinkedList<>();
 		for(ArbreCliques a: niveauActuel)
 		{
@@ -377,7 +379,7 @@ public class ArbreCliques
 						nouveau.listePeres.add(this);
 					for(ArbreCliques pere: listePeres)
 					{
-						System.out.println("addProcessus:" + this.hashCode() + ", "+ pere.hashCode());
+						//System.out.println("addProcessus:" + this.hashCode() + ", "+ pere.hashCode());
 						pere.remonter(nouveau.getValeur(), this);
 					}
 				}
@@ -403,14 +405,33 @@ public class ArbreCliques
 			this.marque = nouveau;
 			if(this.valeur.accepte(nouveau))
 			{
-				for(ArbreCliques pere: listePeres)
+				try
 				{
-					System.out.println("remonter:" + this.hashCode() + ", " + pere.hashCode());
-					pere.remonter(nouveau, this);
+					ArbreCliques[] copiePeres = new ArbreCliques[listePeres.size()];
+					copiePeres = listePeres.toArray(copiePeres);
+					
+//					for(ArbreCliques pere: listePeres)
+//					{
+//						//System.out.println("remonter:" + this.hashCode() + ", " + pere.hashCode());
+//						pere.remonter(nouveau, this);
+//					}
+					for(ArbreCliques pere: copiePeres)
+					{
+						pere.remonter(nouveau, this);
+					}
+				}
+				catch(ConcurrentModificationException e)
+				{
+					System.err.println("Erreur dans remonter: this = " + this.valeur + 
+							", nouveau = " + nouveau);
+					System.err.println("stacktrace:");
+					e.printStackTrace();
+					System.exit(1);
 				}
 			}
 			else
 			{
+				System.out.println("recherche du croisement");
 				rechercherCroisement(nouveau);
 			}
 		}
