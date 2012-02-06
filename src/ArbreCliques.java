@@ -16,9 +16,6 @@ public class ArbreCliques
 	//noeuds de l'arbre avec lesquels le noeud courant n'a pas de lien
 	//protected LinkedList<ArbreCliques> listeBloquants = new LinkedList<>();
 	
-	//indique si on est remonté après avoir inséré ce processus
-	protected Processus marque;
-	
 	//lors de la remontée, indique par quel fils on est arrivé
 	protected ArbreCliques filsPrecedent;
 	
@@ -36,19 +33,6 @@ public class ArbreCliques
 		this.filsPrecedent = filsPrecedent;
 	}
 
-	/**
-	 * @return the marque
-	 */
-	public Processus getMarque() {
-		return marque;
-	}
-
-	/**
-	 * @param marque the marque to set
-	 */
-	public void setMarque(Processus marque) {
-		this.marque = marque;
-	}
 
 	public ArbreCliques(Processus p) {
 		this.valeur = p;
@@ -64,7 +48,7 @@ public class ArbreCliques
 	 */
 	public ArbreCliques dupliquer()
 	{
-		System.out.println("appel de dupliquer");
+		//System.out.println("appel de dupliquer");
 		ArbreCliques n = new ArbreCliques(valeur);
 		
 		//la table de hachage permet d'associer les anciens noeuds aux nouveaux (ceux qui
@@ -87,7 +71,7 @@ public class ArbreCliques
 	protected void dupliquer(LinkedList<ArbreCliques> niveauActuel,
 							Hashtable<ArbreCliques, ArbreCliques> table)
 	{
-		System.out.println("entrée dans la récursive, taille du niveau: " + niveauActuel.size());
+		//System.out.println("entrée dans la récursive, taille du niveau: " + niveauActuel.size());
 		LinkedList<ArbreCliques> niveauSuivant = new LinkedList<>();
 		for(ArbreCliques a: niveauActuel)
 		{
@@ -292,7 +276,7 @@ public class ArbreCliques
 		else
 		{
 			int ajout = valeur == null? 0 : 1;
-			int min = 10000;
+			int min = Integer.MAX_VALUE;
 			int local;
 			for(ArbreCliques a: listeFils)
 			{
@@ -313,7 +297,7 @@ public class ArbreCliques
 		{
 			for(ArbreCliques a: listeFils)
 			{
-				//si on utilise la liste des "bloquants", décommanter cette ligne et commenter la suivante
+				//si on utilise la liste des "bloquants", décommenter cette ligne et commenter la suivante
 				//a.addProcessus(nouveau, hauteur - 1, new LinkedList<ArbreCliques>());
 				a.addProcessus(nouveau, hauteur-1);
 			}
@@ -366,7 +350,8 @@ public class ArbreCliques
 
 	protected void addProcessus(ArbreCliques nouveau, int profondeur)
 	{
-		if(valeur.accepte(nouveau.getValeur()) && marque != nouveau.getValeur())
+		
+		if(valeur.accepte(nouveau.getValeur()))
 		{
 			if(profondeur == 0)
 			{
@@ -375,25 +360,37 @@ public class ArbreCliques
 				if(!listeFils.contains(nouveau))
 				{
 					listeFils.add(nouveau);
-					System.out.println("nouveau ajouté");
+					//System.out.println("nouveau ajouté");
 					if(!nouveau.listePeres.contains(this))
 					{
 						nouveau.listePeres.add(this);
-						System.out.println("père ajouté");
+						//System.out.println("père ajouté");
 					}
-						
-					for(ArbreCliques pere: listePeres)
+					
+					ArbreCliques[] copiePeres = new ArbreCliques[listePeres.size()];
+					copiePeres = listePeres.toArray(copiePeres);
+//					for(ArbreCliques pere: listePeres)
+//					{
+//						//System.out.println("addProcessus:" + this.hashCode() + ", "+ pere.hashCode());
+//						pere.remonter(nouveau.getValeur(), this);
+//					}
+					for(ArbreCliques pere: copiePeres)
 					{
-						//System.out.println("addProcessus:" + this.hashCode() + ", "+ pere.hashCode());
 						pere.remonter(nouveau.getValeur(), this);
 					}
 				}
 			}
 			else
 			{
-				for(ArbreCliques fils: listeFils)
+				ArbreCliques[] copieFils = new ArbreCliques[listeFils.size()];
+				copieFils = listeFils.toArray(copieFils);
+//				for(ArbreCliques fils: listeFils)
+//				{
+//					fils.addProcessus(nouveau, profondeur-1);
+//				}
+				for(ArbreCliques fils: copieFils)
 				{
-					fils.addProcessus(nouveau, profondeur-1);
+					fils.addProcessus(nouveau, profondeur - 1);
 				}
 			}
 		}
@@ -407,7 +404,6 @@ public class ArbreCliques
 		if(valeur != null)
 		{
 			this.filsPrecedent = filsPrecedent;
-			this.marque = nouveau;
 			if(this.valeur.accepte(nouveau))
 			{
 				try
@@ -433,7 +429,7 @@ public class ArbreCliques
 			}
 			else
 			{
-				System.out.println("recherche du croisement");
+				//System.out.println("recherche du croisement");
 				rechercherCroisement(nouveau);
 			}
 		}

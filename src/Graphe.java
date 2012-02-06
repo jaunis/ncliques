@@ -1,12 +1,12 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
-import java.security.InvalidParameterException;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
@@ -23,7 +23,21 @@ public class Graphe {
 	 */
 	protected ArbreCliques arbre = new ArbreCliques();
 	protected LinkedList<Long> utilMemoire = new LinkedList<>();
-		
+	
+	protected FileWriter fw; 
+	protected BufferedWriter output; 
+	
+
+	public Graphe()
+	{
+		try {
+			fw = new FileWriter("log_bdd.txt", true);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		output = new BufferedWriter(fw);
+	}
 	/**
 	 * @return the utilMemoire
 	 */
@@ -128,7 +142,7 @@ public class Graphe {
 	
 	/**
 	 * supprime du HitlessGraph les Processus n'ayant pas une association avec chaque Sorte<br/>
-	 * <b>Pr�requis: </b> Le HitlessGraph a d�j� �t� calcul�
+	 * <b>Prérequis: </b> Le HitlessGraph a déjà été calculé
 	 */
 	public void nettoyerGraphe()
 	{
@@ -145,13 +159,21 @@ public class Graphe {
 	}
 	/**
 	 * Calcule la liste des cliques<br/>
-	 * <b>Prérequis:</b> le HitlessGraph a d�j� �t� nettoy�
+	 * <b>Prérequis:</b> le HitlessGraph a déjà été nettoyé
 	 */
 	public void rechercherCliques()
 	{
 //		System.err.println("Recherche inopérante pour le moment.");
 //		System.exit(1);
 		rechercherCliques(new LinkedList<Sorte>(this.listeSortes));
+		try {
+			output.flush();
+			output.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+		
 	}
 	
 	/**
@@ -166,7 +188,14 @@ public class Graphe {
 			Sorte first = liste.removeFirst();
 			ajouterSorte(first);
 //			System.out.println("taille de la liste: " + liste.size());
-//			System.out.println("profondeur de l'arbre: " + arbre.getProfondeurMax());
+			System.out.println("profondeur de l'arbre: " + arbre.getProfondeurMax());
+			try {
+				output.write(afficherCliques());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			rechercherCliques(liste);	
 		}
 		
@@ -177,7 +206,7 @@ public class Graphe {
 	 */
 	public void ajouterSorte(Sorte s)
 	{
-		System.out.println(s.getListeProcessus().size());
+		//System.out.println(s.getListeProcessus().size());
 		for(Processus p: s.getListeProcessus())
 		{
 			arbre.addProcessus(p);
