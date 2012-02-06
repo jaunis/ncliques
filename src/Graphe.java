@@ -63,7 +63,7 @@ public class Graphe {
 		
 		System.out.println("Frappes supprimées. Tri...");
 		//Trieur.trierSortes("rand", g.getListeSortes());
-		Trieur.trierSortesOptimal("minSommeRelations", "moyenne", g.getListeSortes());
+		Trieur.trierSortesOptimal("minMinNbRelations", "moyenne", g.getListeSortes());
 		System.out.println("Tri effectué. Recherche des n-cliques...");
 		Date datedeb = new Date();
 		g.rechercherCliques();
