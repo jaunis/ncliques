@@ -233,7 +233,10 @@ public class ArbreCliques
 			String retour = "";
 			for(ArbreCliques f: listeFils)
 			{
-				retour += f.toString(prefixe + this.valeur + ", ");
+				if(valeur == null)
+					retour += f.toString(prefixe);
+				else
+					retour += f.toString(prefixe + this.valeur + ", ");
 			}
 			return retour;
 		}
