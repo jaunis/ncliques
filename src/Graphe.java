@@ -1,8 +1,5 @@
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
@@ -24,19 +21,19 @@ public class Graphe {
 	 */
 	protected ArbreCliques arbre = new ArbreCliques();
 	protected LinkedList<Long> utilMemoire = new LinkedList<>();
-	protected FileWriter fw;
-	protected BufferedWriter output;
-		
-	public Graphe()
-	{
-		try {
-			fw = new FileWriter("log_master.txt", true);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		output = new BufferedWriter(fw);
-	}
+//	protected FileWriter fw;
+//	protected BufferedWriter output;
+//		
+//	public Graphe()
+//	{
+//		try {
+//			fw = new FileWriter("log_master.txt", true);
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		output = new BufferedWriter(fw);
+//	}
 	/**
 	 * @return the utilMemoire
 	 */
@@ -50,7 +47,7 @@ public class Graphe {
 	public static void main(String[] args) 
 	{
 		Graphe g = new Graphe();
-		g.chargerGraphe("src/graphes/egfr20_flat.ph");
+		g.chargerGraphe("src/graphes/tcrsig94_flat.ph");
 		
 		System.out.println("Graphe chargé. Calcul du HitlessGraph...");
 		g.getHitlessGraph();
@@ -63,7 +60,7 @@ public class Graphe {
 		
 		System.out.println("Frappes supprimées. Tri...");
 		//Trieur.trierSortes("rand", g.getListeSortes());
-		Trieur.trierSortesOptimal("minMinNbRelations", "moyenne", g.getListeSortes());
+		Trieur.trierSortesOptimal("minNbProcessus", "moyenne", g.getListeSortes());
 		System.out.println("Tri effectué. Recherche des n-cliques...");
 		Date datedeb = new Date();
 		g.rechercherCliques();
@@ -158,35 +155,36 @@ public class Graphe {
 	public void rechercherCliques()
 	{
 		rechercherCliques(new LinkedList<Sorte>(this.listeSortes));
-		try {
-			output.flush();
-			output.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			output.flush();
+//			output.close();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		
 	}
 	
 	/**
-	 * m�thode appel�e par par rechercherCliques()
+	 * méthode appelée par par rechercherCliques()
 	 * @param liste
 	 */
 	protected void rechercherCliques(LinkedList<Sorte> liste)
 	{
 		if(!liste.isEmpty())
 		{
-			
-			utilMemoire.add(ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed());
 			Sorte first = liste.removeFirst();
 			ajouterSorte(first);
-			try {
-				output.write(afficherCliques());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+//			try {
+//				output.write(afficherCliques());
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 			//System.out.println(liste.size());
+			long memoire = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed();
+			System.out.println(memoire);
+			utilMemoire.add(memoire);
 			rechercherCliques(liste);	
 		}
 		
@@ -203,6 +201,7 @@ public class Graphe {
 		}
 		arbre.setHauteur(arbre.getHauteur() + 1);
 		arbre.nettoyer();
+		System.gc();
 	}
 	
 	/**
