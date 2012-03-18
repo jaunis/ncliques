@@ -101,7 +101,7 @@ public class ArbreCliques
 			//on crée le niveau suivant de noeuds à dupliquer
 			for(ArbreCliques fils: a.getListeFils())
 			{
-				if(!niveauSuivant.contains(fils)) niveauSuivant.add(f);
+				if(!niveauSuivant.contains(fils)) niveauSuivant.add(fils);
 			}
 		}
 		// si le niveau suivant est vide, on a terminé, sinon on continue
